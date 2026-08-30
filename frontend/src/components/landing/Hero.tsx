@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 
 export default function Hero() {
   const [vectors, setVectors] = useState<number | null>(null);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     api.health().then((h) => setVectors(h.vectors)).catch(() => {});
@@ -13,7 +15,12 @@ export default function Hero() {
 
   return (
     <section className="max-w-6xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-20">
-      <div className="max-w-3xl">
+      <motion.div
+        className="max-w-3xl"
+        initial={reduce ? undefined : { opacity: 0, y: 10 }}
+        animate={reduce ? undefined : { opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      >
         <div className="eyebrow mb-5">Mastercard Innovation Challenge · GFF 2026</div>
 
         <h1 className="text-4xl md:text-5xl font-semibold tracking-tight leading-[1.1]">
@@ -35,7 +42,7 @@ export default function Hero() {
             How it works
           </a>
         </div>
-      </div>
+      </motion.div>
 
       <div className="flex flex-wrap gap-x-10 gap-y-4 mt-14 pt-8 border-t" style={{ borderColor: "var(--border)" }}>
         <Stat value={vectors ?? 15} label="grounded attack vectors" />

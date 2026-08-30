@@ -43,6 +43,18 @@ An audit against a checklist of "generic AI-generated aesthetic" signals (purple
 - Progressive disclosure in the detect view (fused score → per-signal breakdown → grounded explanation) — mirrors how Stripe Radar / Sift present risk, and was already correct before this pass.
 - The closed-loop SVG diagram — a real information diagram explaining an actual mechanism, not decorative art, so it survived the "stop using cards/decoration everywhere" audit.
 
+## Motion pass (added `motion` / Framer Motion)
+
+Added purposeful, minimal motion using the `motion` library, guided by the same "does this communicate something real" test as everything else:
+
+- Section-level scroll reveal (`Reveal.tsx`) on the landing page — content arrives once as it enters view, applied at the section level only (never per-card in a grid), so it reads as the page loading in, not a decorative loop.
+- The hero fades/slides in once on mount (it's above the fold, so this is an entrance, not a scroll reveal).
+- The two feedback paths in the closed-loop diagram get a flowing dashed-line animation (`.flow-line`, pure CSS) — this is the one place motion illustrates the actual concept being explained (circulation along a loop), not just polish.
+- Detector metric numbers count up (`Counter.tsx`) when a new result arrives, communicating "this was just computed," not decoration on a static number.
+- All motion respects `prefers-reduced-motion` (checked via `useReducedMotion` and a global CSS override).
+
+**Caught and reverted**: a staggered entrance animation on the EntityGraph's nodes/edges (riskiest entities appearing first) shipped with a real bug — 70 of 71 nodes and all edges got stuck at `opacity: 0` in-browser, verified via direct DOM inspection, not just visual guess. Rather than debug Framer Motion's SVG-transform internals under deadline pressure, it was reverted to plain, immediately-rendered SVG elements. A broken decorative entrance on the one genuinely load-bearing visualization in the product is a strictly worse outcome than no entrance animation at all — consistent with "never animate simply because animation is possible."
+
 ## Known trade-offs / not done
 
 - The entity graph caps at ~70 nodes and uses a synchronous force layout (not a real physics library) for time reasons; it is accurate but not as smooth as a production graph library would be at larger scale.

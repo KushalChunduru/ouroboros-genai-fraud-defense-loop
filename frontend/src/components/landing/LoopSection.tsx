@@ -1,52 +1,55 @@
+import Reveal from "@/components/Reveal";
 import { Eyebrow } from "./ProblemSection";
 import { IconLoop, IconMicroscope } from "./icons";
 
 export default function LoopSection() {
   return (
     <section id="loop" className="max-w-6xl mx-auto px-6 py-16 border-t" style={{ borderColor: "var(--border)" }}>
-      <div className="max-w-2xl mb-10">
-        <Eyebrow>What makes it a loop</Eyebrow>
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mt-2">
-          Not generate-once, train-once, report-once
-        </h2>
-        <p className="mt-3 text-sm md:text-base" style={{ color: "var(--muted)" }}>
-          Two mechanisms turn the pipeline above into an actual closed loop — measurable round over round, not
-          asserted in a slide.
-        </p>
-      </div>
-
-      <div className="card p-4 md:p-8 mb-8 overflow-x-auto scrollbar-thin">
-        <LoopDiagram />
-      </div>
-
-      <div className="grid md:grid-cols-2">
-        <div className="p-6 md:pr-8" style={{ borderTop: "1px solid var(--border)" }}>
-          <div className="flex items-center gap-2 mb-3">
-            <IconLoop color="var(--legit)" />
-            <div className="text-xs font-semibold tracking-wide" style={{ color: "var(--legit)" }}>
-              LOOP 1 — SELF-PLAY ARMS RACE
-            </div>
-          </div>
-          <p className="text-sm" style={{ color: "var(--muted)" }}>
-            Each round, the attacker escalates evasion specifically on the vectors the fused detector caught best
-            last round — an adaptive minimax dynamic — and a fresh detector is trained and evaluated on a held-out
-            split. The round-over-round recall curve is live in the console, not a claimed property.
+      <Reveal>
+        <div className="max-w-2xl mb-10">
+          <Eyebrow>What makes it a loop</Eyebrow>
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mt-2">
+            Not generate-once, train-once, report-once
+          </h2>
+          <p className="mt-3 text-sm md:text-base" style={{ color: "var(--muted)" }}>
+            Two mechanisms turn the pipeline above into an actual closed loop — measurable round over round, not
+            asserted in a slide.
           </p>
         </div>
-        <div className="p-6 md:pl-8" style={{ borderTop: "1px solid var(--border)", borderLeft: "1px solid var(--border)" }}>
-          <div className="flex items-center gap-2 mb-3">
-            <IconMicroscope color="var(--warn)" />
-            <div className="text-xs font-semibold tracking-wide" style={{ color: "var(--warn)" }}>
-              LOOP 2 — ZERO-DAY DISCOVERY
-            </div>
-          </div>
-          <p className="text-sm" style={{ color: "var(--muted)" }}>
-            An unsupervised agent mines exactly the transactions the current detector already scores as low-risk —
-            its blind spot — clusters the anomalies, and asks an LLM to draft a new attack hypothesis per cluster,
-            feeding candidates straight back into the taxonomy.
-          </p>
+
+        <div className="card p-4 md:p-8 mb-8 overflow-x-auto scrollbar-thin">
+          <LoopDiagram />
         </div>
-      </div>
+
+        <div className="grid md:grid-cols-2">
+          <div className="p-6 md:pr-8" style={{ borderTop: "1px solid var(--border)" }}>
+            <div className="flex items-center gap-2 mb-3">
+              <IconLoop color="var(--legit)" />
+              <div className="text-xs font-semibold tracking-wide" style={{ color: "var(--legit)" }}>
+                LOOP 1 — SELF-PLAY ARMS RACE
+              </div>
+            </div>
+            <p className="text-sm" style={{ color: "var(--muted)" }}>
+              Each round, the attacker escalates evasion specifically on the vectors the fused detector caught best
+              last round — an adaptive minimax dynamic — and a fresh detector is trained and evaluated on a held-out
+              split. The round-over-round recall curve is live in the console, not a claimed property.
+            </p>
+          </div>
+          <div className="p-6 md:pl-8" style={{ borderTop: "1px solid var(--border)", borderLeft: "1px solid var(--border)" }}>
+            <div className="flex items-center gap-2 mb-3">
+              <IconMicroscope color="var(--warn)" />
+              <div className="text-xs font-semibold tracking-wide" style={{ color: "var(--warn)" }}>
+                LOOP 2 — ZERO-DAY DISCOVERY
+              </div>
+            </div>
+            <p className="text-sm" style={{ color: "var(--muted)" }}>
+              An unsupervised agent mines exactly the transactions the current detector already scores as low-risk —
+              its blind spot — clusters the anomalies, and asks an LLM to draft a new attack hypothesis per cluster,
+              feeding candidates straight back into the taxonomy.
+            </p>
+          </div>
+        </div>
+      </Reveal>
     </section>
   );
 }
@@ -71,6 +74,7 @@ function LoopDiagram() {
 
       {/* feedback: defend -> generate (self-play) */}
       <path
+        className="flow-line"
         d="M690,130 C 690,230 500,230 450,130"
         stroke="var(--legit)"
         strokeWidth="2"
@@ -87,6 +91,7 @@ function LoopDiagram() {
 
       {/* feedback: defend -> identify (zero-day) */}
       <path
+        className="flow-line"
         d="M735,130 C 900,300 250,320 165,130"
         stroke="var(--warn)"
         strokeWidth="2"

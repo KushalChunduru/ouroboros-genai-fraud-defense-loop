@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { api, DetectResponse, GenerateResponse } from "@/lib/api";
 import EntityGraph from "./EntityGraph";
+import Counter from "./Counter";
 
 function MetricPill({ label, value, suffix = "", color = "var(--accent)" }: { label: string; value: number; suffix?: string; color?: string }) {
   return (
@@ -11,9 +12,8 @@ function MetricPill({ label, value, suffix = "", color = "var(--accent)" }: { la
       <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>
         {label}
       </div>
-      <div className="data text-2xl font-semibold mt-1" style={{ color }}>
-        {(value * 100).toFixed(1)}
-        {suffix}
+      <div className="text-2xl font-semibold mt-1" style={{ color }}>
+        <Counter value={value * 100} suffix={suffix} />
       </div>
     </div>
   );

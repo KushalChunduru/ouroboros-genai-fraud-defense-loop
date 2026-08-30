@@ -139,6 +139,21 @@ button:focus-visible {
   color: var(--accent);
 }
 
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* Flowing dash: communicates circulation along the feedback paths in the
+   loop diagram -- the one place motion illustrates the actual concept. */
+.flow-line {
+  animation: flow 1.2s linear infinite;
+}
+@keyframes flow {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
 .scrollbar-thin::-webkit-scrollbar {
   width: 8px;
   height: 8px;
