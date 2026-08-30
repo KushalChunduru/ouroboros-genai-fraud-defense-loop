@@ -93,6 +93,40 @@ function metricsTable() {
   });
 }
 
+function fidelityTable() {
+  const rows = [
+    ["Signal (arXiv:2604.13125)", "Entity-conditioned (ours)", "Naive row-independent baseline", "Ratio"],
+    ["Burst clustering (Fano factor, transactions/shared-device/10-min)", "5.2 – 6.3", "0.09 – 0.16", "~35–64×"],
+    ["Single-owner device fraction", "81% – 84%", "50% – 54%", "~1.6×"],
+    ["Velocity-rule trigger rate (>4 txn/hr/device)", "1.5% – 2.8%", "1.0% – 1.6%", "~1.4–2.4×"],
+  ];
+  const widths = [4200, 2100, 2600, 1500];
+  return new Table({
+    width: { size: 10400, type: WidthType.DXA },
+    columnWidths: widths,
+    rows: rows.map((r, i) =>
+      new TableRow({ children: r.map((t, j) => cell(t, { header: i === 0, width: widths[j], shade: i === 0 ? ACCENT : (i % 2 === 0 ? "F3F4F6" : null) })) })
+    ),
+  });
+}
+
+function feasibilityTable() {
+  const rows = [
+    ["Claim", "Evidence, not assertion"],
+    ["Fits a live authorization path", "Single-transaction scoring endpoint measured at 12–65ms server-side (time.perf_counter around actual model inference), inside the 50–100ms industry target"],
+    ["Threshold reflects business cost, not a fixed cutoff", "Interactive tuner recomputes precision/recall/F1/FPR/estimated-cost live from held-out scores as cost assumptions change; on one real run, moving to the cost-optimal threshold cut estimated cost from $6,000 to $1,560"],
+    ["Results are shareable, not locked in a session", "Every scored batch gets a standalone permalink (/console/report/{batch_id}) a reviewer can open independently, without re-running the pipeline"],
+  ];
+  const widths = [3800, 6600];
+  return new Table({
+    width: { size: 10400, type: WidthType.DXA },
+    columnWidths: widths,
+    rows: rows.map((r, i) =>
+      new TableRow({ children: r.map((t, j) => cell(t, { header: i === 0, width: widths[j], shade: i === 0 ? ACCENT : (i % 2 === 0 ? "F3F4F6" : null) })) })
+    ),
+  });
+}
+
 function pipelineTable() {
   const rows = [
     ["Layer", "Component", "Role"],
@@ -166,6 +200,15 @@ const doc = new Document({
         p(
           "Every attack profile accepts an evasion_level in [0,1]: as it rises, burst spacing widens, device fan-out shrinks, amount jitter tightens toward the legitimate distribution, and session-novelty signal weakens — modeling an attacker who adapts to a defense that keeps catching them. This parameter is what the self-play loop (Section 5) escalates round over round."
         ),
+        h2("3.4 Fidelity Lab: validating the claim with computed numbers, not just a citation"),
+        p(
+          "Citing arXiv:2604.13125 establishes that naive generators have this failure mode; it does not by itself prove our generator avoids it. The prototype includes a Fidelity Lab that closes that gap: for any generated batch, it builds the exact naive-generator baseline the paper describes — not by training a GAN, but by independently shuffling that batch's entity_id, device_id, ip_subnet, and timestamp columns. This operation is mathematically what a row-independent generator (CTGAN, TVAE, GaussianCopula) produces: every column's marginal distribution is preserved exactly (same amounts, same categories, same counts), while all cross-column joint structure is destroyed. Comparing the real batch against this shuffled twin isolates precisely the effect entity-conditioning has, computed live and reproducibly rather than asserted."
+        ),
+        fidelityTable(),
+        p(""),
+        p(
+          "One result was not the one hypothesized going in, and is reported here rather than adjusted away: an initial device-fan-out Gini metric moved in the opposite direction expected. Investigating why surfaced a more interesting finding than originally assumed — naive shuffling does not just fail to fabricate fraud rings well, it corrupts the legitimate class: a real customer's repeat visits to their own device get scattered across many fake owners, so an ordinary loyal customer starts looking exactly like a fraud ring. The single-owner-device-fraction metric above measures that effect directly and was verified directionally stable across three independent random seeds on realistic 1,000-row batches before being shipped."
+        ),
 
         h1("4. Pillar 3 — Defend: A Fused Tabular + Graph + Content Detector"),
         p(
@@ -190,6 +233,14 @@ const doc = new Document({
         p(
           "An unsupervised layer (Isolation Forest, restricted to transactions the current detector already scores as low-risk — its blind spot) surfaces anomaly clusters; a Gemini reasoning agent drafts a natural-language hypothesis for each cluster, grounded strictly in that cluster's statistics (size, mean amount, dominant channel/category, mean device fan-out and session novelty). This automates the challenge brief's explicit ask that 'the gaps your defense reveals feed back into new attack ideas,' rather than leaving it as a narrative aspiration."
         ),
+        h2("4.4 The decision threshold is a business-cost choice, not a fixed 0.5"),
+        p(
+          "Current fraud-ops practice sets the classification threshold to minimize total expected cost (missed-fraud cost + false-decline cost), not to maximize precision/recall symmetrically, and the 2026 industry benchmark bar is high recall with false-positive rate under 1%. The prototype's threshold tuner recomputes precision, recall, F1, FPR, and estimated total cost live from the scores already returned by detection — no re-scoring required — as a reviewer edits their own cost-per-missed-fraud and cost-per-false-decline assumptions, and offers a one-click 'cost-optimal threshold' that sweeps for the minimum-cost cutoff. On one real run, moving from the default 0.5 to the suggested cost-optimal threshold of 0.15 cut estimated cost from $6,000 to $1,560 while raising recall."
+        ),
+        h2("4.5 Real-time feasibility, proven per transaction"),
+        p(
+          "Batch scoring demonstrates accuracy; it does not by itself demonstrate that the detector is fast enough to sit inline in a live authorization path, where the industry target is sub-100ms. A dedicated single-transaction endpoint scores exactly one transaction through the currently trained detector and measures inference latency server-side with time.perf_counter(). Across repeated live tests, latency measured 12–65ms per transaction — comfortably inside the 50–100ms target — using the identical detector object trained in Section 4, not a separate lightweight model swapped in for the demo."
+        ),
 
         h1("5. The Self-Play Arms Race: A Real Closed Loop"),
         p(
@@ -204,16 +255,31 @@ const doc = new Document({
           "Agentic-checkout attack vectors (agentic_checkout_hijack, agentic_carding_burst, agent_credential_exfil) are scored by the same fused detector as classic card-present/card-not-present fraud, using session_novelty and tool_call_burst as behavioral-sequence features standing in for an AI shopping agent's prompt/tool-call/session trajectory — directly inspired by 2026 research proposing fraud-detection-style behavioral sequence modeling for securing LLM agents (arXiv:2605.01143). This means Ouroboros defends both the fraud era Mastercard has decades of data on and the fraud era it is only now becoming exposed to via UCP/ACP, without maintaining two separate detection systems."
         ),
 
-        h1("7. Real-World Feasibility"),
+        h1("7. One Continuous Workflow, Not Four Disconnected Demos"),
+        p(
+          "An earlier iteration of the console was four independent tabs; leaving one discarded its state, so the self-play and zero-day screens each silently generated their own fresh batch instead of building on the one already scored — four demos under one navigation bar, not a closed loop. The console was restructured as a single scrolling page with five sequential stages (Identify → Generate & Detect → Self-Play → Zero-Day → Summary): a progress rail replaces the tab switcher with numbered, checkmarked anchor links that never unmount state, the selected vectors and generated batch flow down as props so each stage genuinely builds on the last, Zero-Day Discovery defaults to reusing the exact batch and detector from Generate & Detect rather than a disconnected sample, and a closing Run Summary synthesizes every stage's real output — including honestly reporting which stages have not been run yet, rather than showing fabricated zeros."
+        ),
+        p(
+          "Every scored batch additionally gets a standalone permalink report (/console/report/{batch_id}) — a separate page that fetches that specific run's cached results by ID and renders them read-only, shareable in a message without asking the recipient to re-run anything."
+        ),
+
+        h1("8. Real-World Feasibility"),
         bullet("Privacy: every transaction, entity, device, and narrative is synthetic and generated at runtime — no real cardholder data or PII is used anywhere in the system, making it safe to run as a pre-production stress-testing sandbox."),
         bullet("Architectural fit: the feature pipeline (app/defend/features.py, app/defend/graph_model.py) is designed to be pointed at real production transaction logs unmodified — the same code path computes velocity and device fan-out whether the input is simulated or real."),
         bullet("Operational fit: a bank could run N self-play rounds against a candidate detector before shipping it, and route the zero-day agent's hypotheses into an analyst review queue rather than auto-updating the taxonomy unsupervised — keeping a human in the loop for the highest-stakes decision."),
         bullet("Strategic fit: the agentic-commerce vectors target exactly the surface Mastercard is exposing via UCP/ACP partnerships in 2026, ahead of most public defensive tooling."),
         bullet("Explainability: attribution-grounded investigator notes (Section 4.2) map directly onto a compliance/SAR workflow rather than stopping at a bare probability score."),
-
-        h1("8. Novelty Summary"),
+        p(""),
+        feasibilityTable(),
+        p(""),
         p(
-          "Three choices differentiate Ouroboros from a typical GAN-then-classifier submission: (1) an entity-conditioned generator built specifically to avoid a documented, cited failure mode of naive tabular generators; (2) a self-play arms race that makes the closed loop measurable round-over-round rather than asserted in a slide; and (3) a zero-day discovery agent that automates taxonomy growth from the defender's own blind spots, closing the loop back into Pillar 1 without human authoring."
+          "Stated plainly rather than glossed over: the prototype's data store is process-local and in-memory, appropriate for a demo, not a production deployment — a real deployment would back batches, trained models, and reports with a real datastore and per-session isolation. This is called out explicitly in the codebase (backend/app/store.py) and was the subject of a concrete fix during development: detectors are now keyed by batch_id rather than a single 'last trained' pointer, so that scoring two different batches in the same process session does not silently corrupt each other's results — verified with two real batches scored back to back.",
+          { italics: true, color: MUTED, size: 18 }
+        ),
+
+        h1("9. Novelty Summary"),
+        p(
+          "Ouroboros differentiates from a typical GAN-then-classifier submission on five points: (1) an entity-conditioned generator built specifically to avoid a documented, cited failure mode of naive tabular generators — and a Fidelity Lab that measures whether it actually does, on computed numbers, on every batch, rather than resting on the citation alone; (2) a self-play arms race that makes the closed loop measurable round-over-round rather than asserted in a slide; (3) a zero-day discovery agent that automates taxonomy growth from the defender's own blind spots, closing the loop back into Pillar 1 without human authoring; (4) a cost-based decision threshold and a measured-latency real-time scoring path, turning the feasibility claim into two concrete numbers instead of an architectural analogy; and (5) a workflow restructured around one continuous, shareable run rather than four disconnected demo screens."
         ),
 
         hr(),
