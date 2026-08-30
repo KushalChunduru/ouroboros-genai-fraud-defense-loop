@@ -23,14 +23,12 @@ export default function ProblemSection() {
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {STATS.map((s) => (
-          <div key={s.label} className="card-2 p-5 flex flex-col gap-2">
+          <div key={s.label} className="card-2 card-hover p-5 flex flex-col gap-2">
             <span className="text-2xl md:text-3xl font-semibold" style={{ color: "var(--accent-2)" }}>
               {s.value}
             </span>
             <span className="text-sm">{s.label}</span>
-            <span className="text-xs mt-auto" style={{ color: "var(--muted)" }}>
-              {s.sub}
-            </span>
+            <span className="pill mt-auto w-fit">{s.sub}</span>
           </div>
         ))}
       </div>

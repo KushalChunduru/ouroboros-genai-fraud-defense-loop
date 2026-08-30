@@ -43,17 +43,10 @@ export default function Hero() {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
-          <Link
-            href="/console"
-            className="px-6 py-3 rounded-full font-medium transition-transform hover:-translate-y-0.5"
-            style={{ background: "var(--accent)", color: "white" }}
-          >
+          <Link href="/console" className="btn-primary px-6 py-3 rounded-full font-medium">
             Launch the console →
           </Link>
-          <a
-            href="#pillars"
-            className="px-6 py-3 rounded-full font-medium card-2 transition-transform hover:-translate-y-0.5"
-          >
+          <a href="#pillars" className="card-2 card-hover px-6 py-3 rounded-full font-medium hover:-translate-y-0.5">
             See how it works
           </a>
         </div>

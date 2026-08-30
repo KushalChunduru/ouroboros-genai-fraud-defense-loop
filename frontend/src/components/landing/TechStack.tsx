@@ -11,7 +11,7 @@ export default function TechStack() {
       </div>
       <div className="flex flex-wrap items-center justify-center gap-2.5">
         {STACK.map((s) => (
-          <span key={s} className="card-2 px-3.5 py-1.5 rounded-full text-xs">
+          <span key={s} className="pill card-hover px-3.5 py-1.5 text-xs">
             {s}
           </span>
         ))}

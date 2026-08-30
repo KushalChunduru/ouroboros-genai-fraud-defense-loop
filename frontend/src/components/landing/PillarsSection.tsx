@@ -1,4 +1,5 @@
 import { Eyebrow } from "./ProblemSection";
+import { IconRadar, IconSpark, IconShield } from "./icons";
 
 const PILLARS = [
   {
@@ -7,6 +8,7 @@ const PILLARS = [
     tag: "Living taxonomy",
     desc: "15 GenAI payment-fraud attack vectors tagged across four independent axes — channel, rail, social-engineering surface, technique — each grounded in a named 2026 source, not invented from first principles.",
     color: "var(--accent)",
+    Icon: IconRadar,
   },
   {
     n: "02",
@@ -14,6 +16,7 @@ const PILLARS = [
     tag: "Entity-conditioned simulation",
     desc: "A persistent-state behavioral simulator (not a row-independent GAN) plus a Gemini narrative agent, producing transaction graphs and attack content that preserve burst timing and device-sharing motifs.",
     color: "var(--accent-2)",
+    Icon: IconSpark,
   },
   {
     n: "03",
@@ -21,6 +24,7 @@ const PILLARS = [
     tag: "Fused detector",
     desc: "Gradient boosting + graph propagation + content-language scoring fused into one risk score, with grounded, attribution-based explanations for every flagged transaction.",
     color: "var(--warn)",
+    Icon: IconShield,
   },
 ];
 
@@ -40,18 +44,21 @@ export default function PillarsSection() {
 
       <div className="grid md:grid-cols-3 gap-5">
         {PILLARS.map((p, i) => (
-          <div key={p.title} className="card p-6 relative overflow-hidden group transition-transform hover:-translate-y-1">
+          <div key={p.title} className="card card-hover p-6 relative overflow-hidden">
             <div
-              className="absolute -top-6 -right-4 text-7xl font-bold opacity-10 select-none"
+              className="absolute -top-6 -right-4 text-7xl font-bold opacity-[0.07] select-none"
               style={{ color: p.color }}
             >
               {p.n}
             </div>
-            <div className="h-9 w-9 rounded-lg mb-4 flex items-center justify-center" style={{ background: `color-mix(in srgb, ${p.color} 18%, transparent)` }}>
-              <div className="h-3 w-3 rounded-sm" style={{ background: p.color }} />
+            <div
+              className="h-10 w-10 rounded-xl mb-4 flex items-center justify-center"
+              style={{ background: `color-mix(in srgb, ${p.color} 16%, transparent)`, border: `1px solid color-mix(in srgb, ${p.color} 35%, transparent)` }}
+            >
+              <p.Icon color={p.color} />
             </div>
             <h3 className="text-lg font-semibold">{p.title}</h3>
-            <div className="text-xs mb-3" style={{ color: p.color }}>
+            <div className="text-xs mb-3 font-medium" style={{ color: p.color }}>
               {p.tag}
             </div>
             <p className="text-sm" style={{ color: "var(--muted)" }}>

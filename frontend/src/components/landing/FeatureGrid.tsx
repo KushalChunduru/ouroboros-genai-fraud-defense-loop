@@ -50,12 +50,10 @@ export default function FeatureGrid() {
           <Link
             key={f.title}
             href="/console"
-            className="card-2 p-5 flex flex-col gap-2 transition-transform hover:-translate-y-1 hover:shadow-lg"
+            className="card-2 card-hover p-5 flex flex-col gap-2 hover:-translate-y-1"
           >
-            <span
-              className="text-[10px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full w-fit"
-              style={{ background: "rgba(124,92,255,0.15)", color: "var(--accent)" }}
-            >
+            <span className="pill w-fit" style={{ color: "var(--accent)", borderColor: "color-mix(in srgb, var(--accent) 35%, var(--border))" }}>
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--accent)" }} />
               {f.tab}
             </span>
             <h3 className="font-medium text-sm mt-1">{f.title}</h3>

@@ -35,7 +35,7 @@ export default function ZeroDayPanel({ selected }: { selected: string[] }) {
           agent drafts a natural-language hypothesis per anomalous cluster, so the taxonomy can grow itself instead
           of staying a static research document.
         </p>
-        <button onClick={run} disabled={loading} className="px-4 py-2 rounded-lg font-medium text-sm" style={{ background: "var(--accent)", color: "white" }}>
+        <button onClick={run} disabled={loading} className="btn-primary px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-60">
           {loading ? "Discovering…" : "Run discovery agent"}
         </button>
         {error && <p className="text-sm mt-3" style={{ color: "var(--danger)" }}>{error}</p>}
@@ -54,10 +54,10 @@ export default function ZeroDayPanel({ selected }: { selected: string[] }) {
           )}
           <div className="grid md:grid-cols-2 gap-3">
             {hyps.map((h) => (
-              <div key={h.cluster_id} className="card-2 p-4 text-sm">
+              <div key={h.cluster_id} className="card-2 card-hover p-4 text-sm" style={{ borderLeft: "2.5px solid var(--warn)" }}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-mono text-xs" style={{ color: "var(--muted)" }}>{h.cluster_id}</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(255,180,84,0.15)", color: "var(--warn)" }}>
+                  <span className="pill" style={{ background: "rgba(255,180,84,0.15)", color: "var(--warn)", borderColor: "transparent" }}>
                     confidence {(h.confidence * 100).toFixed(0)}%
                   </span>
                 </div>

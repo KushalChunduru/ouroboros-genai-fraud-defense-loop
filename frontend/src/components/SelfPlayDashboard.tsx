@@ -58,7 +58,7 @@ export default function SelfPlayDashboard({ selected }: { selected: string[] }) 
             Attack rows / vector
             <input type="number" value={nAttack} onChange={(e) => setNAttack(Number(e.target.value))} className="block mt-1 card-2 px-3 py-1.5 rounded-md w-32" />
           </label>
-          <button onClick={run} disabled={loading} className="px-4 py-2 rounded-lg font-medium text-sm" style={{ background: "var(--accent)", color: "white" }}>
+          <button onClick={run} disabled={loading} className="btn-primary px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-60">
             {loading ? "Running rounds… (can take a minute)" : "Run self-play"}
           </button>
         </div>

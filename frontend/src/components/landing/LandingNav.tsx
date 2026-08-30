@@ -47,11 +47,7 @@ export default function LandingNav() {
           ))}
         </nav>
 
-        <Link
-          href="/console"
-          className="px-4 py-2 rounded-full text-sm font-medium transition-transform hover:-translate-y-0.5"
-          style={{ background: "var(--accent)", color: "white" }}
-        >
+        <Link href="/console" className="btn-primary px-4 py-2 rounded-full text-sm font-medium">
           Launch Console →
         </Link>
       </div>

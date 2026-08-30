@@ -1,4 +1,5 @@
 import { Eyebrow } from "./ProblemSection";
+import { IconLoop, IconMicroscope } from "./icons";
 
 export default function LoopSection() {
   return (
@@ -19,9 +20,14 @@ export default function LoopSection() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-5">
-        <div className="card-2 p-6">
-          <div className="text-xs font-medium mb-2" style={{ color: "var(--accent-2)" }}>
-            LOOP 1 — SELF-PLAY ARMS RACE
+        <div className="card-2 card-hover p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: "color-mix(in srgb, var(--accent-2) 16%, transparent)", border: "1px solid color-mix(in srgb, var(--accent-2) 35%, transparent)" }}>
+              <IconLoop color="var(--accent-2)" />
+            </span>
+            <div className="text-xs font-semibold tracking-wide" style={{ color: "var(--accent-2)" }}>
+              LOOP 1 — SELF-PLAY ARMS RACE
+            </div>
           </div>
           <p className="text-sm" style={{ color: "var(--muted)" }}>
             Each round, the attacker escalates evasion specifically on the vectors the fused detector caught best
@@ -29,9 +35,14 @@ export default function LoopSection() {
             split. The round-over-round recall curve is live in the console, not a claimed property.
           </p>
         </div>
-        <div className="card-2 p-6">
-          <div className="text-xs font-medium mb-2" style={{ color: "var(--warn)" }}>
-            LOOP 2 — ZERO-DAY DISCOVERY
+        <div className="card-2 card-hover p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: "color-mix(in srgb, var(--warn) 16%, transparent)", border: "1px solid color-mix(in srgb, var(--warn) 35%, transparent)" }}>
+              <IconMicroscope color="var(--warn)" />
+            </span>
+            <div className="text-xs font-semibold tracking-wide" style={{ color: "var(--warn)" }}>
+              LOOP 2 — ZERO-DAY DISCOVERY
+            </div>
           </div>
           <p className="text-sm" style={{ color: "var(--muted)" }}>
             An unsupervised agent mines exactly the transactions the current detector already scores as low-risk —
@@ -52,6 +63,9 @@ function LoopDiagram() {
         <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0,0 L10,5 L0,10 z" fill="currentColor" />
         </marker>
+        <filter id="nodeShadow" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#000000" floodOpacity="0.35" />
+        </filter>
       </defs>
 
       {/* main pipeline */}
@@ -96,7 +110,7 @@ function LoopDiagram() {
 
 function Node({ x, y, w, h, label, sub, color }: { x: number; y: number; w: number; h: number; label: string; sub: string; color: string }) {
   return (
-    <g>
+    <g filter="url(#nodeShadow)">
       <rect x={x} y={y} width={w} height={h} rx={14} fill="var(--surface-2)" stroke={color} strokeWidth="1.5" />
       <text x={x + w / 2} y={y + h / 2 - 4} textAnchor="middle" fontSize="18" fontWeight="600" fill="var(--foreground)">
         {label}

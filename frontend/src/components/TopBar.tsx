@@ -34,10 +34,10 @@ export default function TopBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => 
             <button
               key={t}
               onClick={() => setTab(t)}
-              className="px-3.5 py-1.5 rounded-full text-sm transition-colors"
+              className={`px-3.5 py-1.5 rounded-full text-sm transition-all ${tab === t ? "btn-primary" : ""}`}
               style={{
-                background: tab === t ? "var(--accent)" : "transparent",
-                color: tab === t ? "white" : "var(--muted)",
+                background: tab === t ? undefined : "transparent",
+                color: tab === t ? undefined : "var(--muted)",
               }}
             >
               {t}
@@ -50,17 +50,19 @@ export default function TopBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => 
             &larr; Overview
           </Link>
           {error ? (
-            <span style={{ color: "var(--danger)" }}>backend offline</span>
+            <span className="pill" style={{ color: "var(--danger)", borderColor: "color-mix(in srgb, var(--danger) 40%, var(--border))" }}>
+              backend offline
+            </span>
           ) : health ? (
-            <>
-              <span className="h-2 w-2 rounded-full inline-block" style={{ background: "var(--accent-2)" }} />
+            <span className="pill">
+              <span className="h-1.5 w-1.5 rounded-full inline-block" style={{ background: "var(--accent-2)" }} />
               {health.vectors} vectors ·{" "}
               {health.gemini_enabled ? (
                 <span style={{ color: "var(--accent-2)" }}>Gemini live</span>
               ) : (
                 <span style={{ color: "var(--warn)" }}>template fallback mode</span>
               )}
-            </>
+            </span>
           ) : (
             "connecting…"
           )}

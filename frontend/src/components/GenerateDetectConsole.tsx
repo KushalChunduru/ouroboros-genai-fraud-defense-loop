@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { api, DetectResponse, GenerateResponse } from "@/lib/api";
 
-function MetricPill({ label, value, suffix = "" }: { label: string; value: number; suffix?: string }) {
+function MetricPill({ label, value, suffix = "", color = "var(--accent-2)" }: { label: string; value: number; suffix?: string; color?: string }) {
   return (
-    <div className="card-2 px-4 py-3 flex-1 min-w-[110px]">
+    <div className="card-2 card-hover px-4 py-3 flex-1 min-w-[110px] relative overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: color }} />
       <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>
         {label}
       </div>
-      <div className="text-xl font-semibold mt-1">
+      <div className="text-2xl font-semibold mt-1" style={{ color }}>
         {(value * 100).toFixed(1)}
         {suffix}
       </div>
@@ -85,8 +86,7 @@ export default function GenerateDetectConsole({ selected }: { selected: string[]
           <button
             onClick={runGenerate}
             disabled={loading === "gen"}
-            className="px-4 py-2 rounded-lg font-medium text-sm"
-            style={{ background: "var(--accent)", color: "white" }}
+            className="btn-primary px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-60"
           >
             {loading === "gen" ? "Simulating…" : "Generate batch"}
           </button>
@@ -94,8 +94,8 @@ export default function GenerateDetectConsole({ selected }: { selected: string[]
             <button
               onClick={runDetect}
               disabled={loading === "det"}
-              className="px-4 py-2 rounded-lg font-medium text-sm"
-              style={{ background: "var(--accent-2)", color: "#04231c" }}
+              className="px-4 py-2 rounded-lg font-medium text-sm transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+              style={{ background: "var(--accent-2)", color: "#04231c", boxShadow: "0 8px 24px -8px rgba(53,226,194,0.45)" }}
             >
               {loading === "det" ? "Scoring…" : "Run fused detector"}
             </button>
@@ -108,9 +108,9 @@ export default function GenerateDetectConsole({ selected }: { selected: string[]
         <div className="card p-5">
           <h3 className="font-medium mb-2">Batch {gen.batch_id}</h3>
           <div className="flex flex-wrap gap-3 text-sm mb-4">
-            <span className="card-2 px-3 py-1 rounded-full">total {gen.counts.total}</span>
-            <span className="card-2 px-3 py-1 rounded-full" style={{ color: "var(--accent-2)" }}>legit {gen.counts.legit}</span>
-            <span className="card-2 px-3 py-1 rounded-full" style={{ color: "var(--danger)" }}>attack {gen.counts.attack}</span>
+            <span className="pill">total {gen.counts.total}</span>
+            <span className="pill" style={{ color: "var(--accent-2)" }}>legit {gen.counts.legit}</span>
+            <span className="pill" style={{ color: "var(--danger)" }}>attack {gen.counts.attack}</span>
           </div>
           {gen.narratives_sample.length > 0 && (
             <>
@@ -119,7 +119,7 @@ export default function GenerateDetectConsole({ selected }: { selected: string[]
               </h4>
               <div className="grid md:grid-cols-2 gap-2 max-h-64 overflow-y-auto scrollbar-thin pr-1">
                 {gen.narratives_sample.map((n, i) => (
-                  <div key={i} className="card-2 p-3 text-xs">
+                  <div key={i} className="card-2 card-hover p-3 text-xs" style={{ borderLeft: "2.5px solid var(--warn)" }}>
                     <div className="font-medium mb-1" style={{ color: "var(--warn)" }}>{n.attack_vector_name}</div>
                     <p style={{ color: "var(--muted)" }}>{n.text}</p>
                   </div>
@@ -134,32 +134,36 @@ export default function GenerateDetectConsole({ selected }: { selected: string[]
         <div className="card p-5 space-y-4">
           <h3 className="font-medium">Fused detector results (held-out test split)</h3>
           <div className="flex flex-wrap gap-3">
-            <MetricPill label="Precision" value={det.overall.precision} suffix="%" />
-            <MetricPill label="Recall" value={det.overall.recall} suffix="%" />
-            <MetricPill label="F1" value={det.overall.f1} suffix="%" />
-            <MetricPill label="PR-AUC" value={det.overall.pr_auc} suffix="%" />
-            <MetricPill label="False positive rate" value={det.overall.false_positive_rate} suffix="%" />
+            <MetricPill label="Precision" value={det.overall.precision} suffix="%" color="var(--accent)" />
+            <MetricPill label="Recall" value={det.overall.recall} suffix="%" color="var(--accent-2)" />
+            <MetricPill label="F1" value={det.overall.f1} suffix="%" color="var(--accent)" />
+            <MetricPill label="PR-AUC" value={det.overall.pr_auc} suffix="%" color="var(--accent-2)" />
+            <MetricPill label="False positive rate" value={det.overall.false_positive_rate} suffix="%" color="var(--danger)" />
           </div>
 
-          <div className="overflow-x-auto scrollbar-thin">
-            <table className="w-full text-xs">
+          <div className="card-2 overflow-x-auto scrollbar-thin p-1">
+            <table className="w-full text-xs border-separate" style={{ borderSpacing: 0 }}>
               <thead>
                 <tr className="text-left" style={{ color: "var(--muted)" }}>
-                  <th className="py-1 pr-3">Vector</th>
-                  <th className="py-1 pr-3">Precision</th>
-                  <th className="py-1 pr-3">Recall</th>
-                  <th className="py-1 pr-3">F1</th>
-                  <th className="py-1 pr-3">FPR</th>
+                  <th className="py-2 px-3">Vector</th>
+                  <th className="py-2 px-3">Precision</th>
+                  <th className="py-2 px-3">Recall</th>
+                  <th className="py-2 px-3">F1</th>
+                  <th className="py-2 px-3">FPR</th>
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(det.per_vector).map(([vid, m]) => (
-                  <tr key={vid} className="border-t" style={{ borderColor: "var(--border)" }}>
-                    <td className="py-1.5 pr-3">{vid}</td>
-                    <td className="py-1.5 pr-3">{(m.precision * 100).toFixed(0)}%</td>
-                    <td className="py-1.5 pr-3">{(m.recall * 100).toFixed(0)}%</td>
-                    <td className="py-1.5 pr-3">{(m.f1 * 100).toFixed(0)}%</td>
-                    <td className="py-1.5 pr-3">{(m.false_positive_rate * 100).toFixed(1)}%</td>
+                {Object.entries(det.per_vector).map(([vid, m], i) => (
+                  <tr
+                    key={vid}
+                    className="transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]"
+                    style={{ borderTop: i === 0 ? "none" : "1px solid var(--border)" }}
+                  >
+                    <td className="py-2 px-3 font-mono">{vid}</td>
+                    <td className="py-2 px-3">{(m.precision * 100).toFixed(0)}%</td>
+                    <td className="py-2 px-3">{(m.recall * 100).toFixed(0)}%</td>
+                    <td className="py-2 px-3">{(m.f1 * 100).toFixed(0)}%</td>
+                    <td className="py-2 px-3">{(m.false_positive_rate * 100).toFixed(1)}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -174,12 +178,16 @@ export default function GenerateDetectConsole({ selected }: { selected: string[]
               .filter((s) => s.predicted_attack)
               .slice(0, 20)
               .map((s) => (
-                <div key={s.id} className="card-2 p-3 text-xs flex flex-col gap-1">
+                <div
+                  key={s.id}
+                  className="card-2 card-hover p-3 text-xs flex flex-col gap-1"
+                  style={{ borderLeft: `2.5px solid ${s.is_attack ? "var(--danger)" : "var(--warn)"}` }}
+                >
                   <div className="flex items-center justify-between">
                     <span className="font-mono">{s.id}</span>
                     <span
-                      className="px-2 py-0.5 rounded-full"
-                      style={{ background: s.is_attack ? "rgba(255,92,122,0.15)" : "rgba(255,180,84,0.15)", color: s.is_attack ? "var(--danger)" : "var(--warn)" }}
+                      className="pill"
+                      style={{ background: s.is_attack ? "rgba(255,92,122,0.15)" : "rgba(255,180,84,0.15)", color: s.is_attack ? "var(--danger)" : "var(--warn)", borderColor: "transparent" }}
                     >
                       fused {s.fused_score.toFixed(2)} · {s.is_attack ? "true attack" : "false positive"}
                     </span>

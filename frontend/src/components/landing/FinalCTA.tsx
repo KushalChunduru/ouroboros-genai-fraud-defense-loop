@@ -14,11 +14,7 @@ export default function FinalCTA() {
           Every screen runs live against the real backend. Pick attack vectors, generate a batch, score it, and
           watch the arms race play out.
         </p>
-        <Link
-          href="/console"
-          className="px-7 py-3.5 rounded-full font-medium transition-transform hover:-translate-y-0.5"
-          style={{ background: "var(--accent)", color: "white" }}
-        >
+        <Link href="/console" className="btn-primary px-7 py-3.5 rounded-full font-medium">
           Launch the console →
         </Link>
       </div>

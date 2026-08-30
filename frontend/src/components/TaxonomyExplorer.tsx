@@ -48,10 +48,10 @@ export default function TaxonomyExplorer({
                 setFilterAxis(a);
                 setFilterValue("all");
               }}
-              className="px-3 py-1 rounded-full text-xs capitalize"
+              className={`px-3 py-1 rounded-full text-xs capitalize transition-all ${filterAxis === a ? "btn-primary" : ""}`}
               style={{
-                background: filterAxis === a ? "var(--accent)" : "var(--surface-2)",
-                color: filterAxis === a ? "white" : "var(--muted)",
+                background: filterAxis === a ? undefined : "var(--surface-2)",
+                color: filterAxis === a ? undefined : "var(--muted)",
               }}
             >
               {a.replace("_", " ")}
@@ -95,14 +95,14 @@ export default function TaxonomyExplorer({
           <button
             key={v.id}
             onClick={() => toggle(v.id)}
-            className="card-2 p-4 text-left transition-transform hover:-translate-y-0.5"
+            className="card-2 card-hover p-4 text-left hover:-translate-y-0.5"
             style={{ outline: selected.includes(v.id) ? "2px solid var(--accent)" : "none" }}
           >
             <div className="flex items-start justify-between gap-2">
               <h3 className="font-medium text-sm leading-snug">{v.name}</h3>
               <span
-                className="text-[10px] px-1.5 py-0.5 rounded shrink-0"
-                style={{ background: "var(--surface)", color: "var(--warn)" }}
+                className="text-[10px] px-1.5 py-0.5 rounded shrink-0 font-medium"
+                style={{ background: "color-mix(in srgb, var(--warn) 15%, transparent)", color: "var(--warn)" }}
               >
                 sev {v.severity_base.toFixed(2)}
               </span>
@@ -112,7 +112,7 @@ export default function TaxonomyExplorer({
             </p>
             <div className="flex flex-wrap gap-1 mt-2">
               {[v.channel, v.rail, v.social_surface, v.technique].map((tag) => (
-                <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded-full capitalize" style={{ background: "var(--surface)", color: "var(--muted)" }}>
+                <span key={tag} className="pill capitalize" style={{ padding: "2px 8px", fontSize: "10px" }}>
                   {tag.replace(/_/g, " ")}
                 </span>
               ))}

@@ -26,16 +26,79 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Ambient glow field: fixed, behind everything, gives the dark surface depth
+   instead of a flat fill — cheap, high-impact atmosphere for hero/section tops. */
+.glow-field {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.glow-field::before,
+.glow-field::after {
+  content: "";
+  position: absolute;
+  width: 640px;
+  height: 640px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.22;
+}
+.glow-field::before {
+  top: -220px;
+  left: -120px;
+  background: var(--accent);
+}
+.glow-field::after {
+  top: -160px;
+  right: -160px;
+  background: var(--accent-2);
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .card-2 {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 12px;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.card-hover:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: 0 12px 32px -16px rgba(124, 92, 255, 0.35);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 8px 24px -8px rgba(124, 92, 255, 0.55);
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px -10px rgba(124, 92, 255, 0.65);
+  filter: brightness(1.06);
 }
 
 .scrollbar-thin::-webkit-scrollbar {
