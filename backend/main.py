@@ -86,8 +86,7 @@ def detect(req: DetectRequest):
 
     train, test = _split(txns)
     detector = FusedDetector().fit(train)
-    store.last_detector = detector
-    store.last_train_transactions = train
+    store.set_detector(req.batch_id, detector)
 
     bundles = detector.score(test)
     y_true = [t["is_attack"] for t in test]
@@ -165,11 +164,14 @@ def zeroday(req: DetectRequest):
     else:
         raise HTTPException(400, "provide batch_id or transactions")
 
-    detector = store.last_detector
+    # Prefer the detector actually trained on THIS batch_id (correct even if
+    # other batches were scored elsewhere in the meantime); fall back to
+    # whichever detector was trained most recently, then train fresh.
+    detector = store.detectors.get(req.batch_id) or store.last_detector
     if detector is None:
         train, _ = _split(txns)
         detector = FusedDetector().fit(train)
-        store.last_detector = detector
+        store.set_detector(req.batch_id, detector)
 
     hypotheses = discover_zero_day_patterns(txns, detector)
     return {"hypotheses": hypotheses}
