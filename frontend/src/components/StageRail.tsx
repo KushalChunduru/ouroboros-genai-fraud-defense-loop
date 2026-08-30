@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import OuroborosMark from "./landing/OuroborosMark";
 
-const TABS = ["Identify", "Generate & Detect", "Self-Play Arms Race", "Zero-Day Discovery"] as const;
-export type Tab = (typeof TABS)[number];
+export type StageStatus = "done" | "current" | "pending";
+export type Stage = { id: string; label: string; status: StageStatus };
 
-export default function TopBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
+export default function StageRail({ stages }: { stages: Stage[] }) {
   const [health, setHealth] = useState<{ status: string; gemini_enabled: boolean; vectors: number } | null>(null);
   const [error, setError] = useState(false);
 
@@ -24,16 +24,26 @@ export default function TopBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => 
           <span className="font-semibold tracking-tight text-sm">Ouroboros</span>
         </Link>
 
-        <nav className="order-3 md:order-2 w-full md:w-auto flex gap-1 card-2 p-1 rounded-full overflow-x-auto scrollbar-thin">
-          {TABS.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              data-active={tab === t}
-              className="segment shrink-0 whitespace-nowrap"
+        <nav className="order-3 md:order-2 w-full md:w-auto flex gap-1 overflow-x-auto scrollbar-thin">
+          {stages.map((s, i) => (
+            <a
+              key={s.id}
+              href={`#${s.id}`}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm shrink-0 whitespace-nowrap transition-colors"
+              style={{ color: s.status === "pending" ? "var(--muted)" : "var(--foreground)" }}
             >
-              {t}
-            </button>
+              <span
+                className="data h-4 w-4 rounded-full flex items-center justify-center text-[9px] shrink-0"
+                style={{
+                  background: s.status === "done" ? "var(--legit)" : s.status === "current" ? "var(--accent)" : "var(--surface-2)",
+                  color: s.status === "pending" ? "var(--muted)" : s.status === "done" ? "#04231c" : "white",
+                  border: s.status === "pending" ? "1px solid var(--border)" : undefined,
+                }}
+              >
+                {s.status === "done" ? "✓" : i + 1}
+              </span>
+              {s.label}
+            </a>
           ))}
         </nav>
 

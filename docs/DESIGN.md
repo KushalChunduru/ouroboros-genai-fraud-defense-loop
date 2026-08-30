@@ -2,6 +2,17 @@
 
 This documents the reasoning behind the frontend's visual design, not just what changed. It exists because the first two iterations of this UI were built by directly embedding generic hero/dashboard templates — a mistake worth recording, not hiding.
 
+## Console: from four tabs to one workflow
+
+The console originally had four independent tabs (Identify, Generate & Detect, Self-Play, Zero-Day). The structural problem: clicking away from a tab discarded its state, so Self-Play and Zero-Day each silently generated their own fresh batch instead of building on the one you'd already scored — four disconnected demos wearing one nav bar, not a closed loop.
+
+Fixed by restructuring the console as one continuous page (`/console/page.tsx`):
+
+- All four stages plus a final summary render in sequence on one scroll, not behind tabs. `StageRail` replaced the old tab switcher with a progress rail (numbered, checkmarked on completion) whose links are `#anchor` jumps, not state switches — nothing unmounts when you move between stages.
+- State lifted to the page: the vectors picked in Identify, and the batch/detector from Generate & Detect, are passed down as props instead of being re-derived per tab.
+- Zero-Day now defaults to reusing the exact batch and detector from Generate & Detect (`sharedBatch` prop) — the backend already supported an existing `batch_id`, the frontend just wasn't using it. A "use a fresh batch instead" option is kept for when you deliberately want to stress-test a different sample.
+- A new `RunSummary` component synthesizes every stage's real output (vectors tested, batch size, detector F1/FPR, self-play recall trend, zero-day hypothesis count) into one closing report, and is honest about which stages haven't run yet rather than showing empty/zero values.
+
 ## Who this is actually for
 
 **Known:** this is a hackathon submission (Mastercard Innovation Challenge, GFF 2026) with a hard deadline, judged against a fixed rubric (diversity of attacks, fidelity, detection efficacy, novelty, feasibility).

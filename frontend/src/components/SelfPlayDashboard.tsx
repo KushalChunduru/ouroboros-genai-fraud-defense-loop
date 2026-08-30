@@ -6,7 +6,13 @@ import {
 } from "recharts";
 import { api, SelfPlayRound } from "@/lib/api";
 
-export default function SelfPlayDashboard({ selected }: { selected: string[] }) {
+export default function SelfPlayDashboard({
+  selected,
+  onResult,
+}: {
+  selected: string[];
+  onResult?: (rounds: SelfPlayRound[] | null) => void;
+}) {
   const [rounds, setRounds] = useState(5);
   const [nLegit, setNLegit] = useState(300);
   const [nAttack, setNAttack] = useState(35);
@@ -20,6 +26,7 @@ export default function SelfPlayDashboard({ selected }: { selected: string[] }) 
     try {
       const r = await api.selfplay({ rounds, n_legit: nLegit, n_attack_per_vector: nAttack, attack_ids: selected });
       setResults(r.rounds);
+      onResult?.(r.rounds);
     } catch (e) {
       setError(String(e));
     } finally {

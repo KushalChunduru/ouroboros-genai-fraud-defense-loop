@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api, DetectResponse, GenerateResponse } from "@/lib/api";
 import EntityGraph from "./EntityGraph";
 import Counter from "./Counter";
@@ -19,13 +19,24 @@ function MetricPill({ label, value, suffix = "", color = "var(--accent)" }: { la
   );
 }
 
-export default function GenerateDetectConsole({ selected }: { selected: string[] }) {
+export default function GenerateDetectConsole({
+  selected,
+  onResult,
+}: {
+  selected: string[];
+  onResult?: (gen: GenerateResponse | null, det: DetectResponse | null) => void;
+}) {
   const [nLegit, setNLegit] = useState(400);
   const [nAttack, setNAttack] = useState(40);
   const [gen, setGen] = useState<GenerateResponse | null>(null);
   const [det, setDet] = useState<DetectResponse | null>(null);
   const [loading, setLoading] = useState<"gen" | "det" | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    onResult?.(gen, det);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gen, det]);
 
   const runGenerate = async () => {
     setLoading("gen");
