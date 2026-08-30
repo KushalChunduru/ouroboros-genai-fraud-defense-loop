@@ -1,4 +1,5 @@
 import random
+import time
 import uuid
 
 from fastapi import FastAPI, HTTPException
@@ -13,7 +14,7 @@ from app.loop.self_play import run_self_play
 from app.loop.zero_day import discover_zero_day_patterns
 from app.models import (
     DetectRequest, DetectResponse, GenerateRequest, GenerateResponse, Metrics,
-    ScoredTransaction, SelfPlayRequest, SelfPlayResponse, ZeroDayResponse,
+    ScoredTransaction, SelfPlayRequest, SelfPlayResponse, Transaction, ZeroDayResponse,
 )
 from app.store import store
 
@@ -152,6 +153,46 @@ def zeroday(req: DetectRequest):
 
     hypotheses = discover_zero_day_patterns(txns, detector)
     return {"hypotheses": hypotheses}
+
+
+@app.get("/api/sample_transaction")
+def sample_transaction(kind: str = "legit", attack_id: str | None = None):
+    """One realistic transaction from the entity-conditioned simulator, for
+    the live single-transaction scoring demo -- avoids asking a user to
+    hand-fill 15 numeric fields to see real-time inference in action."""
+    if kind == "attack":
+        vector = next((v for v in TAXONOMY if v["id"] == attack_id), None) or TAXONOMY[0]
+        txns = simulate(TAXONOMY, [vector["id"]], n_legit=0, n_attack_per_vector=1, seed=random.randint(0, 1_000_000))
+    else:
+        txns = simulate(TAXONOMY, [], n_legit=1, n_attack_per_vector=0, seed=random.randint(0, 1_000_000))
+    if not txns:
+        raise HTTPException(500, "simulation produced no rows")
+    return txns[0]
+
+
+@app.post("/api/score_live")
+def score_live(txn: Transaction):
+    """Scores exactly one transaction through the currently trained fused
+    detector and reports measured server-side inference latency -- the
+    concrete proof point for a live-authorization-path deployment, distinct
+    from the batch scoring the rest of the console demonstrates."""
+    detector = store.last_detector
+    if detector is None:
+        raise HTTPException(400, "no trained detector yet -- run Step 2 (Generate & Detect) first")
+
+    row = txn.model_dump()
+    start = time.perf_counter()
+    bundle = detector.score([row])[0]
+    latency_ms = (time.perf_counter() - start) * 1000
+
+    return {
+        "fused_score": round(bundle.fused, 4),
+        "gbm_score": round(bundle.gbm, 4),
+        "graph_score": round(bundle.graph, 4),
+        "content_score": round(bundle.content, 4),
+        "predicted_attack": bundle.fused >= 0.5,
+        "latency_ms": round(latency_ms, 3),
+    }
 
 
 @app.post("/api/narrative_preview")

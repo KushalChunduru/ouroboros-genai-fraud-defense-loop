@@ -85,6 +85,15 @@ export type ZeroDayHypothesis = {
   confidence: number;
 };
 
+export type LiveScoreResponse = {
+  fused_score: number;
+  gbm_score: number;
+  graph_score: number;
+  content_score: number;
+  predicted_attack: boolean;
+  latency_ms: number;
+};
+
 async function req<T>(path: string, opts?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     headers: { "Content-Type": "application/json" },
@@ -112,4 +121,8 @@ export const api = {
     req<{ rounds: SelfPlayRound[] }>("/api/selfplay", { method: "POST", body: JSON.stringify(body) }),
   zeroday: (body: { batch_id: string }) =>
     req<{ hypotheses: ZeroDayHypothesis[] }>("/api/zeroday", { method: "POST", body: JSON.stringify(body) }),
+  sampleTransaction: (kind: "legit" | "attack", attackId?: string) =>
+    req<Transaction>(`/api/sample_transaction?kind=${kind}${attackId ? `&attack_id=${attackId}` : ""}`),
+  scoreLive: (txn: Transaction) =>
+    req<LiveScoreResponse>("/api/score_live", { method: "POST", body: JSON.stringify(txn) }),
 };

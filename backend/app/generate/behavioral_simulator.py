@@ -86,10 +86,13 @@ def generate_legit_batch(n: int, start: datetime, span_hours: int, rng: random.R
 
     # Realistic hard negatives: shared household/office devices across a few
     # entities, so device fan-out alone isn't a perfect legit/attack separator.
-    for _ in range(max(1, len(entities) // 12)):
-        a, b = rng.sample(entities, 2)
-        shared = rng.choice(a.devices)
-        b.devices.append(shared)
+    # Needs at least 2 entities -- skipped for tiny batches (e.g. single
+    # sample-transaction requests) rather than crashing.
+    if len(entities) >= 2:
+        for _ in range(max(1, len(entities) // 12)):
+            a, b = rng.sample(entities, 2)
+            shared = rng.choice(a.devices)
+            b.devices.append(shared)
 
     out = []
     for _ in range(n):

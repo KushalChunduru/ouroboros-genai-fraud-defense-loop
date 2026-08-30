@@ -17,6 +17,12 @@ Most fraud-simulation projects generate a dataset once, train a classifier once,
    - A **self-play arms race** (`/api/selfplay`) runs N rounds where the attacker escalates evasion specifically on the vectors the defender caught best last round, and a fresh detector is trained/evaluated each round — the round-over-round recall curve is the demoable evidence of a real closed loop.
    - A **zero-day discovery agent** (`/api/zeroday`) runs unsupervised anomaly detection restricted to the defender's current blind spot, clusters the anomalies, and asks an LLM to draft a new attack hypothesis per cluster — growing the taxonomy automatically instead of leaving it a static document.
 
+## Feasibility & usability, made concrete not asserted
+
+- **Cost-based threshold tuning** (`ThresholdTuner`) — 2026 fraud-ops practice sets the decision threshold to minimize total business cost (missed-fraud cost + false-decline cost), not a fixed 0.5 cutoff. Enter your own cost assumptions and the cost-minimizing threshold is computed live from the scores already returned by `/api/detect`, no re-scoring needed.
+- **Real single-transaction scoring with measured latency** (`/api/score_live`, `LiveScoring`) — batch scoring proves accuracy; this proves the fused detector is fast enough to sit inline in a live authorization path. The industry target for that path is sub-100ms; sample transactions typically score in 10-30ms end-to-end here, measured server-side with `time.perf_counter()`, not estimated.
+- **One continuous workflow, not four disconnected tabs** — see `docs/DESIGN.md` for why the console was restructured so each stage's real output (selected vectors → generated batch → trained detector) feeds the next, ending in one synthesized run summary.
+
 ## Architecture
 
 ```

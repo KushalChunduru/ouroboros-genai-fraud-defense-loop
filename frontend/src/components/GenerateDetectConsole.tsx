@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api, DetectResponse, GenerateResponse } from "@/lib/api";
+import { api, AttackVector, DetectResponse, GenerateResponse } from "@/lib/api";
 import EntityGraph from "./EntityGraph";
 import Counter from "./Counter";
+import ThresholdTuner from "./ThresholdTuner";
+import LiveScoring from "./LiveScoring";
 
 function MetricPill({ label, value, suffix = "", color = "var(--accent)" }: { label: string; value: number; suffix?: string; color?: string }) {
   return (
@@ -32,11 +34,16 @@ export default function GenerateDetectConsole({
   const [det, setDet] = useState<DetectResponse | null>(null);
   const [loading, setLoading] = useState<"gen" | "det" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [vectors, setVectors] = useState<AttackVector[]>([]);
 
   useEffect(() => {
     onResult?.(gen, det);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gen, det]);
+
+  useEffect(() => {
+    api.taxonomy().then((r) => setVectors(r.vectors)).catch(() => {});
+  }, []);
 
   const runGenerate = async () => {
     setLoading("gen");
@@ -179,6 +186,11 @@ export default function GenerateDetectConsole({
           </div>
 
           <h4 className="text-sm font-medium" style={{ color: "var(--muted)" }}>
+            Tune the decision threshold
+          </h4>
+          <ThresholdTuner scored={det.scored} />
+
+          <h4 className="text-sm font-medium" style={{ color: "var(--muted)" }}>
             Entity relationship graph
           </h4>
           <EntityGraph transactions={gen.transactions} scored={det.scored} />
@@ -211,6 +223,11 @@ export default function GenerateDetectConsole({
           </div>
         </div>
       )}
+
+      <div className="card p-5">
+        <h3 className="font-medium mb-3">Prove real-time feasibility</h3>
+        <LiveScoring vectors={vectors} detectorReady={!!det} />
+      </div>
     </div>
   );
 }
