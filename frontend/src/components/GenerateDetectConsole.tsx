@@ -6,6 +6,7 @@ import EntityGraph from "./EntityGraph";
 import Counter from "./Counter";
 import ThresholdTuner from "./ThresholdTuner";
 import LiveScoring from "./LiveScoring";
+import FidelityLab from "./FidelityLab";
 
 function MetricPill({ label, value, suffix = "", color = "var(--accent)" }: { label: string; value: number; suffix?: string; color?: string }) {
   return (
@@ -142,6 +143,13 @@ export default function GenerateDetectConsole({
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {gen && (
+        <div className="card p-5">
+          <h3 className="font-medium mb-3">Fidelity Lab — prove entity-conditioning matters, on this batch</h3>
+          <FidelityLab batchId={gen.batch_id} />
         </div>
       )}
 

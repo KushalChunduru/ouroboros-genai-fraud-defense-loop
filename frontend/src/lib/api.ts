@@ -93,6 +93,18 @@ export type BatchReport = {
   n_test: number;
 };
 
+export type FidelityMetrics = {
+  burstiness_fano_factor: number;
+  single_owner_device_fraction: number;
+  velocity_exceed_rate: number;
+};
+
+export type FidelityReport = {
+  entity_conditioned: FidelityMetrics;
+  naive_baseline: FidelityMetrics;
+  n: number;
+};
+
 export type LiveScoreResponse = {
   fused_score: number;
   gbm_score: number;
@@ -134,4 +146,5 @@ export const api = {
   scoreLive: (txn: Transaction) =>
     req<LiveScoreResponse>("/api/score_live", { method: "POST", body: JSON.stringify(txn) }),
   report: (batchId: string) => req<BatchReport>(`/api/report/${batchId}`),
+  fidelity: (batchId: string) => req<FidelityReport>(`/api/fidelity/${batchId}`),
 };

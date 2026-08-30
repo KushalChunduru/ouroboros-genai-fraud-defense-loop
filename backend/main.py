@@ -9,6 +9,7 @@ from app.config import GEMINI_ENABLED, load_taxonomy
 from app.defend.detector import FusedDetector, compute_metrics
 from app.defend.explain import explain_transaction
 from app.generate.behavioral_simulator import simulate
+from app.generate.fidelity import compute_fidelity_report
 from app.generate.narrative_agent import generate_narrative
 from app.loop.self_play import run_self_play
 from app.loop.zero_day import discover_zero_day_patterns
@@ -63,6 +64,18 @@ def generate(req: GenerateRequest):
         counts[v["id"]] = sum(1 for t in txns if t.get("attack_vector_id") == v["id"])
 
     return GenerateResponse(batch_id=batch_id, transactions=txns, narratives_sample=narratives_sample, counts=counts)
+
+
+@app.get("/api/fidelity/{batch_id}")
+def fidelity(batch_id: str):
+    """Proves the entity-conditioning claim with computed numbers: builds a
+    naive-generator baseline by independently shuffling this exact batch's
+    structural columns (mathematically what a row-independent tabular
+    generator produces) and compares burst clustering, device-fanout
+    concentration, and velocity-rule calibration against the real batch."""
+    if batch_id not in store.batches:
+        raise HTTPException(404, "unknown batch_id")
+    return compute_fidelity_report(store.batches[batch_id])
 
 
 def _split(transactions: list[dict], test_frac: float = 0.35, seed: int = 7):
