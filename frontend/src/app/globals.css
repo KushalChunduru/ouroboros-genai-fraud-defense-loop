@@ -56,6 +56,26 @@ body {
   background: var(--accent-2);
 }
 
+/* Dusk-sky hero backdrop: black at top fading through indigo/violet into a
+   warm magenta glow near the horizon, echoing an atmospheric hero reference
+   rather than a flat radial blur. Confined to the Hero section only. */
+.hero-sky {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 100%, rgba(196, 79, 190, 0.35), transparent 70%),
+    linear-gradient(
+      180deg,
+      var(--background) 0%,
+      var(--background) 32%,
+      #17123a 55%,
+      #351a5c 72%,
+      #6a2f8f 88%,
+      #a94fc0 100%
+    );
+}
+
 /* Subtle film-grain texture over the flat dark surface — cheap tactility. */
 .grain {
   position: fixed;

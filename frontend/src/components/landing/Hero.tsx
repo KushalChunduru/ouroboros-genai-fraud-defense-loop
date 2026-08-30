@@ -14,6 +14,7 @@ export default function Hero() {
 
   return (
     <section className="relative overflow-hidden">
+      <div className="hero-sky" />
       <div className="absolute inset-0" style={{ maskImage: "linear-gradient(to bottom, black 40%, transparent 95%)" }}>
         <NetworkCanvas />
       </div>
