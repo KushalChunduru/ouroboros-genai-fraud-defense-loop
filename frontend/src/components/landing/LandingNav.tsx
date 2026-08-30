@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import OuroborosMark from "./OuroborosMark";
 
 const LINKS = [
   { href: "#problem", label: "Problem" },
@@ -31,10 +32,10 @@ export default function LandingNav() {
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
         <Link href="/" className="flex items-center gap-2.5">
           <div
-            className="h-8 w-8 rounded-full flex items-center justify-center text-base font-bold"
-            style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-2))" }}
+            className="h-8 w-8 rounded-full flex items-center justify-center"
+            style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
           >
-            &#8734;
+            <OuroborosMark size={18} />
           </div>
           <span className="font-semibold tracking-tight">Ouroboros</span>
         </Link>

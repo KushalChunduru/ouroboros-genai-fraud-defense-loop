@@ -6,31 +6,37 @@ const FEATURES = [
     title: "Filterable attack taxonomy",
     tab: "Identify",
     desc: "Browse 15 grounded vectors by channel, rail, social-engineering surface, or technique family — each with a cited 2026 source, not an assumption.",
+    span: "lg:col-span-2",
   },
   {
     title: "Entity-conditioned batch simulation",
     tab: "Generate & Detect",
     desc: "Generate labeled transaction batches where every entity carries persistent devices, IP, and spend history — so fraud rings show up as real graph motifs.",
+    span: "lg:col-span-1",
   },
   {
     title: "Gemini narrative artifacts",
     tab: "Generate & Detect",
     desc: "See the qualitative side of each attack — phishing scripts, deepfake transcripts, injection payloads — generated live, or from deterministic fallbacks offline.",
+    span: "lg:col-span-1",
   },
   {
     title: "Live fused-detector scoring",
     tab: "Generate & Detect",
     desc: "Precision, recall, F1, PR-AUC, and false-positive rate on a held-out split, broken down per attack vector, with per-transaction grounded explanations.",
+    span: "lg:col-span-2",
   },
   {
     title: "Self-play arms-race chart",
     tab: "Self-Play Arms Race",
     desc: "Run N rounds of escalating attacker evasion against a freshly retrained defender and watch the recall curve move in real time.",
+    span: "lg:col-span-1",
   },
   {
     title: "Zero-day hypothesis generator",
     tab: "Zero-Day Discovery",
     desc: "Cluster the detector's blind spot and get natural-language hypotheses for emerging patterns, ready to feed back into the taxonomy.",
+    span: "lg:col-span-1",
   },
 ];
 
@@ -45,12 +51,12 @@ export default function FeatureGrid() {
         </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {FEATURES.map((f) => (
           <Link
             key={f.title}
             href="/console"
-            className="card-2 card-hover p-5 flex flex-col gap-2 hover:-translate-y-1"
+            className={`card-2 card-hover p-5 flex flex-col gap-2 hover:-translate-y-1 ${f.span}`}
           >
             <span className="pill w-fit" style={{ color: "var(--accent)", borderColor: "color-mix(in srgb, var(--accent) 35%, var(--border))" }}>
               <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--accent)" }} />

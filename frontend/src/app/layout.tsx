@@ -25,6 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <div className="glow-field" aria-hidden="true" />
+        <div className="grain" aria-hidden="true" />
         {children}
       </body>
     </html>
