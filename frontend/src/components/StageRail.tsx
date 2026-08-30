@@ -56,13 +56,13 @@ export default function StageRail({ stages }: { stages: Stage[] }) {
               backend offline
             </span>
           ) : health ? (
-            <span className="pill data">
+            <span className="pill data" title="The fused detector always trains live via scikit-learn regardless of this setting — this only affects whether phishing/deepfake narrative text is LLM-generated or templated.">
               <span className="h-1.5 w-1.5 rounded-full inline-block" style={{ background: "var(--legit)" }} />
-              {health.vectors} vectors ·{" "}
+              {health.vectors} vectors · detector: live-trained ·{" "}
               {health.gemini_enabled ? (
-                <span style={{ color: "var(--legit)" }}>Gemini live</span>
+                <span style={{ color: "var(--legit)" }}>narratives: Gemini live</span>
               ) : (
-                <span style={{ color: "var(--warn)" }}>template fallback mode</span>
+                <span style={{ color: "var(--warn)" }}>narratives: templated</span>
               )}
             </span>
           ) : (

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { DetectResponse, GenerateResponse, SelfPlayRound, ZeroDayHypothesis } from "@/lib/api";
 
 export default function RunSummary({
@@ -28,6 +29,15 @@ export default function RunSummary({
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm" style={{ color: "var(--muted)" }}>
+          Batch <span className="data">{gen.batch_id}</span>
+        </span>
+        <Link href={`/console/report/${gen.batch_id}`} className="btn btn-ghost text-xs" target="_blank">
+          Share this run as a standalone link →
+        </Link>
+      </div>
+
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: "var(--border)" }}>
         <SummaryCell label="Vectors tested" value={String(selected.length || "all 15")} />
         <SummaryCell label="Batch size" value={String(gen.counts.total)} />

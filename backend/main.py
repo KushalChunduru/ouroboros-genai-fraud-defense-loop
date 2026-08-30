@@ -125,7 +125,27 @@ def detect(req: DetectRequest):
             attack_vector_id=t.get("attack_vector_id"), explanation=explanation,
         ))
 
+    if req.batch_id:
+        counts = {"total": len(txns), "legit": sum(1 for t in txns if not t["is_attack"]),
+                  "attack": sum(1 for t in txns if t["is_attack"])}
+        store.reports[req.batch_id] = {
+            "batch_id": req.batch_id, "counts": counts,
+            "overall": overall, "per_vector": {k: v.model_dump() for k, v in per_vector.items()},
+            "n_test": len(test),
+        }
+
     return DetectResponse(scored=scored, overall=Metrics(**overall), per_vector=per_vector)
+
+
+@app.get("/api/report/{batch_id}")
+def get_report(batch_id: str):
+    """Permalink-able snapshot of one run's results -- lets a specific batch's
+    detection outcome be shared as a standalone link instead of requiring a
+    re-run of the whole console workflow."""
+    report = store.reports.get(batch_id)
+    if report is None:
+        raise HTTPException(404, "no cached report for this batch_id -- run /api/detect on it first")
+    return report
 
 
 @app.post("/api/selfplay", response_model=SelfPlayResponse)

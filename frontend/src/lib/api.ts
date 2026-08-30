@@ -85,6 +85,14 @@ export type ZeroDayHypothesis = {
   confidence: number;
 };
 
+export type BatchReport = {
+  batch_id: string;
+  counts: Record<string, number>;
+  overall: Metrics;
+  per_vector: Record<string, Metrics>;
+  n_test: number;
+};
+
 export type LiveScoreResponse = {
   fused_score: number;
   gbm_score: number;
@@ -125,4 +133,5 @@ export const api = {
     req<Transaction>(`/api/sample_transaction?kind=${kind}${attackId ? `&attack_id=${attackId}` : ""}`),
   scoreLive: (txn: Transaction) =>
     req<LiveScoreResponse>("/api/score_live", { method: "POST", body: JSON.stringify(txn) }),
+  report: (batchId: string) => req<BatchReport>(`/api/report/${batchId}`),
 };

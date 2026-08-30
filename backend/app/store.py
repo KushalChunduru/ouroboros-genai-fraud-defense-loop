@@ -9,6 +9,9 @@ class Store:
         self.batches: dict[str, list[dict]] = {}
         self.last_detector: FusedDetector | None = None
         self.last_train_transactions: list[dict] | None = None
+        # Cached detect() results keyed by batch_id, so a permalink report
+        # page can fetch a specific run's results without re-training.
+        self.reports: dict[str, dict] = {}
 
 
 store = Store()
