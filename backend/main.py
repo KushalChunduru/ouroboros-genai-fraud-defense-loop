@@ -1,0 +1,162 @@
+import random
+import uuid
+
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.config import GEMINI_ENABLED, load_taxonomy
+from app.defend.detector import FusedDetector, compute_metrics
+from app.defend.explain import explain_transaction
+from app.generate.behavioral_simulator import simulate
+from app.generate.narrative_agent import generate_narrative
+from app.loop.self_play import run_self_play
+from app.loop.zero_day import discover_zero_day_patterns
+from app.models import (
+    DetectRequest, DetectResponse, GenerateRequest, GenerateResponse, Metrics,
+    ScoredTransaction, SelfPlayRequest, SelfPlayResponse, ZeroDayResponse,
+)
+from app.store import store
+
+app = FastAPI(title="Ouroboros — GenAI Payment Fraud Red/Blue Loop", version="0.1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+TAXONOMY = load_taxonomy()
+MAX_LLM_EXPLANATIONS = 20
+
+
+@app.get("/api/health")
+def health():
+    return {"status": "ok", "gemini_enabled": GEMINI_ENABLED, "vectors": len(TAXONOMY)}
+
+
+@app.get("/api/taxonomy")
+def get_taxonomy():
+    return {"vectors": TAXONOMY}
+
+
+@app.post("/api/generate", response_model=GenerateResponse)
+def generate(req: GenerateRequest):
+    attack_ids = req.attack_ids or [v["id"] for v in TAXONOMY]
+    txns = simulate(
+        TAXONOMY, attack_ids, req.n_legit, req.n_attack_per_vector,
+        evasion_level=req.evasion_level, seed=req.seed,
+    )
+    batch_id = f"batch_{uuid.uuid4().hex[:10]}"
+    store.batches[batch_id] = txns
+
+    narratives_sample = [
+        {"attack_vector_id": t["attack_vector_id"], "attack_vector_name": t["attack_vector_name"], "text": t["narrative_text"]}
+        for t in txns if t.get("narrative_text")
+    ][:12]
+
+    counts = {"total": len(txns), "legit": sum(1 for t in txns if not t["is_attack"]),
+              "attack": sum(1 for t in txns if t["is_attack"])}
+    for v in TAXONOMY:
+        counts[v["id"]] = sum(1 for t in txns if t.get("attack_vector_id") == v["id"])
+
+    return GenerateResponse(batch_id=batch_id, transactions=txns, narratives_sample=narratives_sample, counts=counts)
+
+
+def _split(transactions: list[dict], test_frac: float = 0.35, seed: int = 7):
+    rng = random.Random(seed)
+    shuffled = transactions[:]
+    rng.shuffle(shuffled)
+    cut = int(len(shuffled) * (1 - test_frac))
+    return shuffled[:cut], shuffled[cut:]
+
+
+@app.post("/api/detect", response_model=DetectResponse)
+def detect(req: DetectRequest):
+    if req.transactions:
+        txns = [t.model_dump() for t in req.transactions]
+    elif req.batch_id:
+        if req.batch_id not in store.batches:
+            raise HTTPException(404, "unknown batch_id")
+        txns = store.batches[req.batch_id]
+    else:
+        raise HTTPException(400, "provide batch_id or transactions")
+
+    train, test = _split(txns)
+    detector = FusedDetector().fit(train)
+    store.last_detector = detector
+    store.last_train_transactions = train
+
+    bundles = detector.score(test)
+    y_true = [t["is_attack"] for t in test]
+    y_score = [b.fused for b in bundles]
+    y_pred = [s >= 0.5 for s in y_score]
+    overall = compute_metrics(y_true, y_pred, y_score)
+
+    vector_ids = sorted({t.get("attack_vector_id") for t in test if t.get("attack_vector_id")})
+    per_vector = {}
+    for vid in vector_ids:
+        idxs = [i for i, t in enumerate(test) if t.get("attack_vector_id") == vid]
+        legit_idxs = [i for i, t in enumerate(test) if not t["is_attack"]]
+        sub_true = [test[i]["is_attack"] for i in idxs + legit_idxs]
+        sub_pred = [y_pred[i] for i in idxs + legit_idxs]
+        sub_score = [y_score[i] for i in idxs + legit_idxs]
+        per_vector[vid] = Metrics(**compute_metrics(sub_true, sub_pred, sub_score))
+
+    order = sorted(range(len(test)), key=lambda i: y_score[i], reverse=True)
+    flagged_order = [i for i in order if y_pred[i]]
+
+    scored = []
+    for rank, i in enumerate(order):
+        t, b = test[i], bundles[i]
+        predicted = y_pred[i]
+        if predicted and rank < MAX_LLM_EXPLANATIONS:
+            explanation = explain_transaction(t, b)
+        elif predicted:
+            explanation = f"Fused score {b.fused:.2f} exceeded threshold (tabular {b.gbm:.2f}, graph {b.graph:.2f}, content {b.content:.2f})."
+        else:
+            explanation = "Below decision threshold; no action."
+        scored.append(ScoredTransaction(
+            id=t["id"], fused_score=round(b.fused, 4), gbm_score=round(b.gbm, 4),
+            graph_score=round(b.graph, 4), content_score=round(b.content, 4),
+            predicted_attack=predicted, is_attack=t["is_attack"],
+            attack_vector_id=t.get("attack_vector_id"), explanation=explanation,
+        ))
+
+    return DetectResponse(scored=scored, overall=Metrics(**overall), per_vector=per_vector)
+
+
+@app.post("/api/selfplay", response_model=SelfPlayResponse)
+def selfplay(req: SelfPlayRequest):
+    results = run_self_play(TAXONOMY, req.attack_ids, req.rounds, req.n_legit, req.n_attack_per_vector)
+    return {"rounds": results}
+
+
+@app.post("/api/zeroday", response_model=ZeroDayResponse)
+def zeroday(req: DetectRequest):
+    if req.batch_id:
+        if req.batch_id not in store.batches:
+            raise HTTPException(404, "unknown batch_id")
+        txns = store.batches[req.batch_id]
+    elif req.transactions:
+        txns = [t.model_dump() for t in req.transactions]
+    else:
+        raise HTTPException(400, "provide batch_id or transactions")
+
+    detector = store.last_detector
+    if detector is None:
+        train, _ = _split(txns)
+        detector = FusedDetector().fit(train)
+        store.last_detector = detector
+
+    hypotheses = discover_zero_day_patterns(txns, detector)
+    return {"hypotheses": hypotheses}
+
+
+@app.post("/api/narrative_preview")
+def narrative_preview(attack_id: str):
+    vector = next((v for v in TAXONOMY if v["id"] == attack_id), None)
+    if not vector:
+        raise HTTPException(404, "unknown attack_id")
+    return {"text": generate_narrative(vector)}

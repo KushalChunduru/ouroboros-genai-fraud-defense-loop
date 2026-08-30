@@ -1,0 +1,169 @@
+{
+  "vectors": [
+    {
+      "id": "deepfake_voice_ivr",
+      "name": "Real-time deepfake voice authorization bypass",
+      "channel": "ivr_call_center",
+      "rail": "card_network",
+      "social_surface": "voice",
+      "technique": "deepfake_impersonation",
+      "description": "Attacker uses a real-time voice-cloning model (seconds of public audio are enough) to impersonate a cardholder during an IVR or call-center authentication flow, authorizing a limit increase, card reissue to a new address, or a large transfer.",
+      "source": "Adaptive Security / didit.me 2026 voice-cloning fraud reporting",
+      "severity_base": 0.82
+    },
+    {
+      "id": "deepfake_video_executive",
+      "name": "Deepfake video executive wire-authorization fraud",
+      "channel": "p2p_wallet",
+      "rail": "ach",
+      "social_surface": "video",
+      "technique": "deepfake_impersonation",
+      "description": "Real-time deepfake video of a CFO/executive on a conference call authorizes an urgent high-value wire or B2B payment, bypassing normal dual-control review under social pressure of urgency.",
+      "source": "2024 Hong Kong $25M deepfake CFO case, widely cited in 2026 fraud forecasts",
+      "severity_base": 0.9
+    },
+    {
+      "id": "agentic_checkout_hijack",
+      "name": "AI shopping-agent hijacking via prompt injection",
+      "channel": "agentic_checkout",
+      "rail": "card_network",
+      "social_surface": "none",
+      "technique": "prompt_injection_agent_hijack",
+      "description": "A malicious merchant page or tool response injects instructions into an AI shopping agent's context (e.g. via UCP/ACP-style agent commerce flows), causing it to check out with the user's stored tokenized card at an attacker-controlled destination, override an item substitution, or leak stored payment tokens.",
+      "source": "Signifyd / Darwinium 2026 agentic-commerce fraud reports; Visa PERC +450% AI-agent dark-web mentions H1 2026",
+      "severity_base": 0.86
+    },
+    {
+      "id": "agentic_carding_burst",
+      "name": "Autonomous AI-agent carding / card-testing bursts",
+      "channel": "agentic_checkout",
+      "rail": "card_network",
+      "social_surface": "none",
+      "technique": "genai_scaled_carding",
+      "description": "A compromised or attacker-operated AI shopping agent autonomously tests large volumes of stolen card numbers against live low-value checkouts, pacing requests to mimic normal browsing so per-card velocity stays under naive thresholds.",
+      "source": "HUMAN Security documented AI agents autonomously running carding attacks, 2026",
+      "severity_base": 0.75
+    },
+    {
+      "id": "llm_low_slow_carding",
+      "name": "LLM-orchestrated distributed low-and-slow card testing",
+      "channel": "ecommerce_cnp",
+      "rail": "card_network",
+      "social_surface": "none",
+      "technique": "genai_scaled_carding",
+      "description": "An LLM planning agent distributes small-value authorization attempts for a stolen card list across many merchants, devices, and time windows, explicitly reasoning about typical velocity-rule thresholds to stay beneath them.",
+      "source": "Extrapolated from Visa PERC dark-web AI-agent carding reporting, 2026",
+      "severity_base": 0.7
+    },
+    {
+      "id": "synthetic_identity_origination",
+      "name": "GenAI-crafted synthetic ('Frankenstein') identity account origination",
+      "channel": "ecommerce_cnp",
+      "rail": "card_network",
+      "social_surface": "chat",
+      "technique": "synthetic_identity",
+      "description": "GenAI fabricates a coherent fake identity (name, employment history, social footprint, credit-building pattern) used to originate a new card account that behaves like a legitimate thin-file consumer for months before bust-out.",
+      "source": "US synthetic identity fraud $30-35B/yr, TransUnion/Experian 2026 forecasts",
+      "severity_base": 0.78
+    },
+    {
+      "id": "romance_pig_butchering_bot",
+      "name": "Autonomous GenAI romance / pig-butchering scam bot",
+      "channel": "p2p_wallet",
+      "rail": "crypto_offramp",
+      "social_surface": "chat",
+      "technique": "genai_social_engineering",
+      "description": "A fully autonomous emotionally-tuned chatbot builds a long-term relationship with a victim over weeks, then guides them through a series of escalating payments/crypto transfers to a fraudulent investment platform, with no human operator involved.",
+      "source": "Experian 2026 fraud forecast: emotionally intelligent GenAI romance-scam bots",
+      "severity_base": 0.8
+    },
+    {
+      "id": "faas_phishing_kit",
+      "name": "Fraud-as-a-Service GenAI phishing/smishing kit",
+      "channel": "ecommerce_cnp",
+      "rail": "card_network",
+      "social_surface": "sms",
+      "technique": "genai_social_engineering",
+      "description": "Subscription Fraud-as-a-Service platforms bundle GenAI-personalized phishing/smishing templates, mule-account rental, and deepfake voice add-ons, letting low-skill actors run large personalized campaigns harvesting card and OTP data.",
+      "source": "FS-ISAC 2026 AI-Generated Fraud report",
+      "severity_base": 0.65
+    },
+    {
+      "id": "ai_dispute_narrative_abuse",
+      "name": "AI-generated fraudulent chargeback/dispute narratives",
+      "channel": "ecommerce_cnp",
+      "rail": "card_network",
+      "social_surface": "chat",
+      "technique": "ai_dispute_abuse",
+      "description": "A GenAI tool mass-produces plausible, individually-tailored 'item not received' / 'unauthorized transaction' dispute narratives to claim first-party (friendly) fraud chargebacks at scale while evading merchant text-similarity dispute filters.",
+      "source": "Extrapolated from FS-ISAC FaaS reporting and dispute-abuse literature",
+      "severity_base": 0.6
+    },
+    {
+      "id": "mule_network_llm_routing",
+      "name": "LLM-optimized mule-network transaction routing",
+      "channel": "p2p_wallet",
+      "rail": "real_time_payments",
+      "social_surface": "none",
+      "technique": "mule_orchestration",
+      "description": "An LLM planning agent dynamically routes layered payments across a rented mule-account network, choosing amounts, timing, and paths to minimize graph-based AML detection signals (fan-in/fan-out ratios, cycle length).",
+      "source": "Grounded in GNN/AML mule-detection literature (Thoughtworks, NVIDIA 2026)",
+      "severity_base": 0.77
+    },
+    {
+      "id": "voice_biometric_spoofing",
+      "name": "Voice-biometric enrollment spoofing",
+      "channel": "ivr_call_center",
+      "rail": "card_network",
+      "social_surface": "voice",
+      "technique": "deepfake_impersonation",
+      "description": "Attacker uses synthesized speech to pass initial voice-biometric enrollment or re-verification, since anti-spoofing detectors trained on known synthesis techniques generalize poorly to unseen ones.",
+      "source": "2026 voice-cloning spoofing generalization study",
+      "severity_base": 0.72
+    },
+    {
+      "id": "synthetic_card_data_gan",
+      "name": "GAN-synthesized card/BIN data for validation attacks",
+      "channel": "ecommerce_cnp",
+      "rail": "card_network",
+      "social_surface": "none",
+      "technique": "genai_scaled_carding",
+      "description": "A GAN or diffusion model trained on leaked BIN-range statistics generates plausible card numbers passing Luhn/BIN checks, seeding large-scale automated validation ('card testing') runs against soft-decline endpoints.",
+      "source": "Grounded in GAN/diffusion tabular-fraud literature (arXiv:2402.09830, FinDiff)",
+      "severity_base": 0.68
+    },
+    {
+      "id": "agent_credential_exfil",
+      "name": "Agentic AI credential/token exfiltration via tool poisoning",
+      "channel": "agentic_checkout",
+      "rail": "card_network",
+      "social_surface": "none",
+      "technique": "prompt_injection_agent_hijack",
+      "description": "A poisoned third-party tool/plugin returns instructions that cause a user's AI agent to reveal stored tokenized payment credentials or session tokens to an attacker-controlled endpoint disguised as a legitimate merchant API response.",
+      "source": "Grounded in agent-security literature, arXiv:2605.01143",
+      "severity_base": 0.83
+    },
+    {
+      "id": "atm_deepfake_video_auth",
+      "name": "Deepfake-assisted ATM/branch identity verification bypass",
+      "channel": "atm",
+      "rail": "card_network",
+      "social_surface": "video",
+      "technique": "deepfake_impersonation",
+      "description": "A printed or screen-replayed deepfake face/video defeats liveness checks on video-teller or branch kiosk identity verification to authorize a card PIN reset or large cash withdrawal.",
+      "source": "Grounded in identity-based threat reporting, Security Boulevard 2026",
+      "severity_base": 0.7
+    },
+    {
+      "id": "wallet_sim_swap_genai",
+      "name": "GenAI-assisted SIM-swap social engineering for wallet takeover",
+      "channel": "p2p_wallet",
+      "rail": "real_time_payments",
+      "social_surface": "voice",
+      "technique": "genai_social_engineering",
+      "description": "A GenAI voice/chat agent impersonates the victim convincingly enough to social-engineer a telecom rep into a SIM swap, then takes over OTP-protected mobile wallet and drains linked payment instruments.",
+      "source": "Grounded in 2026 identity-based threat reporting",
+      "severity_base": 0.79
+    }
+  ]
+}
