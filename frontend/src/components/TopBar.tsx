@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 
@@ -17,8 +18,8 @@ export default function TopBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => 
   return (
     <div className="sticky top-0 z-10 border-b" style={{ borderColor: "var(--border)", background: "rgba(11,13,20,0.85)", backdropFilter: "blur(8px)" }}>
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-full flex items-center justify-center text-lg font-bold"
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="h-9 w-9 rounded-full flex items-center justify-center text-lg font-bold transition-transform group-hover:scale-105"
                style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-2))" }}>
             &#8734;
           </div>
@@ -26,7 +27,7 @@ export default function TopBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => 
             <div className="font-semibold tracking-tight text-lg leading-none">Ouroboros</div>
             <div className="text-xs" style={{ color: "var(--muted)" }}>GenAI Payment Fraud Red/Blue Loop</div>
           </div>
-        </div>
+        </Link>
 
         <nav className="flex gap-1 card-2 p-1 rounded-full">
           {TABS.map((t) => (
@@ -44,7 +45,10 @@ export default function TopBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => 
           ))}
         </nav>
 
-        <div className="text-xs flex items-center gap-2" style={{ color: "var(--muted)" }}>
+        <div className="text-xs flex items-center gap-3" style={{ color: "var(--muted)" }}>
+          <Link href="/" className="hidden md:inline hover:underline">
+            &larr; Overview
+          </Link>
           {error ? (
             <span style={{ color: "var(--danger)" }}>backend offline</span>
           ) : health ? (
