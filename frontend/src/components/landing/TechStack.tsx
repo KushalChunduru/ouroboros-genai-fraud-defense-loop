@@ -5,15 +5,11 @@ const STACK = [
 
 export default function TechStack() {
   return (
-    <section className="max-w-6xl mx-auto px-6 py-14">
-      <div className="text-center text-xs uppercase tracking-wider mb-5" style={{ color: "var(--muted)" }}>
-        Built with
-      </div>
-      <div className="flex flex-wrap items-center justify-center gap-2.5">
+    <section className="max-w-6xl mx-auto px-6 py-10 border-t" style={{ borderColor: "var(--border)" }}>
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs" style={{ color: "var(--muted)" }}>
+        <span className="eyebrow shrink-0">Built with</span>
         {STACK.map((s) => (
-          <span key={s} className="pill card-hover px-3.5 py-1.5 text-xs">
-            {s}
-          </span>
+          <span key={s} className="data">{s}</span>
         ))}
       </div>
     </section>

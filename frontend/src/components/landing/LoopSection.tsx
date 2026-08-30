@@ -3,7 +3,7 @@ import { IconLoop, IconMicroscope } from "./icons";
 
 export default function LoopSection() {
   return (
-    <section id="loop" className="max-w-6xl mx-auto px-6 py-20">
+    <section id="loop" className="max-w-6xl mx-auto px-6 py-16 border-t" style={{ borderColor: "var(--border)" }}>
       <div className="max-w-2xl mb-10">
         <Eyebrow>What makes it a loop</Eyebrow>
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mt-2">
@@ -19,13 +19,11 @@ export default function LoopSection() {
         <LoopDiagram />
       </div>
 
-      <div className="grid md:grid-cols-2 gap-5">
-        <div className="card-2 card-hover p-6">
+      <div className="grid md:grid-cols-2">
+        <div className="p-6 md:pr-8" style={{ borderTop: "1px solid var(--border)" }}>
           <div className="flex items-center gap-2 mb-3">
-            <span className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: "color-mix(in srgb, var(--accent-2) 16%, transparent)", border: "1px solid color-mix(in srgb, var(--accent-2) 35%, transparent)" }}>
-              <IconLoop color="var(--accent-2)" />
-            </span>
-            <div className="text-xs font-semibold tracking-wide" style={{ color: "var(--accent-2)" }}>
+            <IconLoop color="var(--legit)" />
+            <div className="text-xs font-semibold tracking-wide" style={{ color: "var(--legit)" }}>
               LOOP 1 — SELF-PLAY ARMS RACE
             </div>
           </div>
@@ -35,11 +33,9 @@ export default function LoopSection() {
             split. The round-over-round recall curve is live in the console, not a claimed property.
           </p>
         </div>
-        <div className="card-2 card-hover p-6">
+        <div className="p-6 md:pl-8" style={{ borderTop: "1px solid var(--border)", borderLeft: "1px solid var(--border)" }}>
           <div className="flex items-center gap-2 mb-3">
-            <span className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: "color-mix(in srgb, var(--warn) 16%, transparent)", border: "1px solid color-mix(in srgb, var(--warn) 35%, transparent)" }}>
-              <IconMicroscope color="var(--warn)" />
-            </span>
+            <IconMicroscope color="var(--warn)" />
             <div className="text-xs font-semibold tracking-wide" style={{ color: "var(--warn)" }}>
               LOOP 2 — ZERO-DAY DISCOVERY
             </div>
@@ -56,16 +52,13 @@ export default function LoopSection() {
 }
 
 function LoopDiagram() {
-  const nodeColors = { identify: "var(--accent)", generate: "var(--accent-2)", defend: "var(--warn)" };
+  const nodeColors = { identify: "var(--accent)", generate: "var(--legit)", defend: "var(--warn)" };
   return (
     <svg viewBox="0 0 900 340" className="w-full min-w-[640px]" style={{ color: "var(--muted)" }}>
       <defs>
         <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0,0 L10,5 L0,10 z" fill="currentColor" />
         </marker>
-        <filter id="nodeShadow" x="-40%" y="-40%" width="180%" height="180%">
-          <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#000000" floodOpacity="0.35" />
-        </filter>
       </defs>
 
       {/* main pipeline */}
@@ -79,13 +72,13 @@ function LoopDiagram() {
       {/* feedback: defend -> generate (self-play) */}
       <path
         d="M690,130 C 690,230 500,230 450,130"
-        stroke="var(--accent-2)"
+        stroke="var(--legit)"
         strokeWidth="2"
         markerEnd="url(#arrow)"
         fill="none"
         strokeDasharray="5 4"
       />
-      <text x="565" y="255" textAnchor="middle" fontSize="13" fill="var(--accent-2)" fontWeight="600">
+      <text x="565" y="255" textAnchor="middle" fontSize="13" fill="var(--legit)" fontWeight="600">
         Self-Play Arms Race
       </text>
       <text x="565" y="273" textAnchor="middle" fontSize="11" fill="var(--muted)">
@@ -110,8 +103,8 @@ function LoopDiagram() {
 
 function Node({ x, y, w, h, label, sub, color }: { x: number; y: number; w: number; h: number; label: string; sub: string; color: string }) {
   return (
-    <g filter="url(#nodeShadow)">
-      <rect x={x} y={y} width={w} height={h} rx={14} fill="var(--surface-2)" stroke={color} strokeWidth="1.5" />
+    <g>
+      <rect x={x} y={y} width={w} height={h} rx={10} fill="var(--surface-2)" stroke={color} strokeWidth="1.5" />
       <text x={x + w / 2} y={y + h / 2 - 4} textAnchor="middle" fontSize="18" fontWeight="600" fill="var(--foreground)">
         {label}
       </text>

@@ -35,7 +35,7 @@ export default function ZeroDayPanel({ selected }: { selected: string[] }) {
           agent drafts a natural-language hypothesis per anomalous cluster, so the taxonomy can grow itself instead
           of staying a static research document.
         </p>
-        <button onClick={run} disabled={loading} className="btn-primary px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-60">
+        <button onClick={run} disabled={loading} className="btn btn-solid">
           {loading ? "Discovering…" : "Run discovery agent"}
         </button>
         {error && <p className="text-sm mt-3" style={{ color: "var(--danger)" }}>{error}</p>}

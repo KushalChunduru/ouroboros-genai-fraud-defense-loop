@@ -1,16 +1,21 @@
 @import "tailwindcss";
 
 :root {
+  /* Surface & text: tonal elevation carries depth, not blur/glow. */
   --background: #0b0d14;
   --surface: #12141f;
   --surface-2: #191c2a;
   --border: #262a3d;
+  --border-strong: #333a54;
   --foreground: #e7e9f5;
   --muted: #8b8fa8;
-  --accent: #7c5cff;
-  --accent-2: #35e2c2;
-  --danger: #ff5c7a;
-  --warn: #ffb454;
+
+  /* Semantic data colors: each has ONE meaning, used only where that
+     meaning applies (interactive/legit/fraud/uncertain) -- never decorative. */
+  --accent: #7c5cff;   /* interactive: links, primary actions, active state */
+  --legit: #35e2c2;    /* legitimate / recall / "caught correctly" */
+  --danger: #ff5c7a;   /* attack / fraud / false positive */
+  --warn: #ffb454;     /* severity / uncertainty / needs review */
 }
 
 @theme inline {
@@ -26,86 +31,33 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-/* Ambient glow field: fixed, behind everything, gives the dark surface depth
-   instead of a flat fill — cheap, high-impact atmosphere for hero/section tops. */
-.glow-field {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  overflow: hidden;
-}
-.glow-field::before,
-.glow-field::after {
-  content: "";
-  position: absolute;
-  width: 640px;
-  height: 640px;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.22;
-}
-.glow-field::before {
-  top: -220px;
-  left: -120px;
-  background: var(--accent);
-}
-.glow-field::after {
-  top: -160px;
-  right: -160px;
-  background: var(--accent-2);
-}
-
-/* Dusk-sky hero backdrop: black at top fading through indigo/violet into a
-   warm magenta glow near the horizon, echoing an atmospheric hero reference
-   rather than a flat radial blur. Confined to the Hero section only. */
-.hero-sky {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 90% 55% at 50% 100%, rgba(196, 79, 190, 0.35), transparent 70%),
-    linear-gradient(
-      180deg,
-      var(--background) 0%,
-      var(--background) 32%,
-      #17123a 55%,
-      #351a5c 72%,
-      #6a2f8f 88%,
-      #a94fc0 100%
-    );
-}
-
-/* Subtle film-grain texture over the flat dark surface — cheap tactility. */
-.grain {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.05;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+/* Numeric/data text -- scores, ids, counts -- renders in mono with tabular
+   figures so it reads unambiguously as real data, not prose. */
+.data {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  border-radius: 12px;
+  transition: border-color 150ms ease, background-color 150ms ease;
 }
 
 .card-2 {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  border-radius: 10px;
+  transition: border-color 150ms ease, background-color 150ms ease;
 }
 
 .card-hover:hover {
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-  box-shadow: 0 12px 32px -16px rgba(124, 92, 255, 0.35);
+  border-color: var(--border-strong);
+  background: color-mix(in srgb, var(--surface-2) 92%, white 3%);
 }
 
+/* Tags/status only -- never a button, never a decorative badge. */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -120,16 +72,71 @@ body {
   color: var(--muted);
 }
 
-.btn-primary {
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Segmented control -- for actual mutually-exclusive tab switching only
+   (console nav, taxonomy axis filter). Not a general-purpose button shape. */
+.segment {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.segment[data-active="true"] {
   background: var(--accent);
   color: white;
-  box-shadow: 0 8px 24px -8px rgba(124, 92, 255, 0.55);
-  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
 }
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 32px -10px rgba(124, 92, 255, 0.65);
-  filter: brightness(1.06);
+.segment:focus-visible,
+.btn:focus-visible,
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.segment[data-active="false"] {
+  color: var(--muted);
+}
+.segment[data-active="false"]:hover {
+  color: var(--foreground);
+}
+
+/* Primary/secondary actions: rounded-lg, not full pills -- reserved for
+   the single most important action per view. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.btn-solid {
+  background: var(--accent);
+  color: white;
+}
+.btn-solid:hover {
+  background: color-mix(in srgb, var(--accent) 85%, white 15%);
+}
+.btn-solid:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn-ghost {
+  border: 1px solid var(--border-strong);
+  color: var(--foreground);
+}
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -139,4 +146,11 @@ body {
 .scrollbar-thin::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

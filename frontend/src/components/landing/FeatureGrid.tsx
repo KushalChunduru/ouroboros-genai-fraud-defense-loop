@@ -1,76 +1,87 @@
 import Link from "next/link";
 import { Eyebrow } from "./ProblemSection";
 
-const FEATURES = [
+// Generate & Detect is the core demo action -- it leads, full width, with
+// its three real sub-capabilities shown as columns. The other three tabs
+// follow as three equal cells: 3 + 3 = two clean rows, sized by actual
+// content rather than an arbitrary bento pattern.
+const CORE = {
+  tab: "Generate & Detect",
+  items: [
+    {
+      title: "Entity-conditioned batch simulation",
+      desc: "Every entity carries persistent devices, IP, and spend history, so fraud rings show up as real graph motifs.",
+    },
+    {
+      title: "Gemini narrative artifacts",
+      desc: "Phishing scripts, deepfake transcripts, injection payloads — generated live, or from deterministic fallbacks offline.",
+    },
+    {
+      title: "Live fused-detector scoring",
+      desc: "Precision, recall, F1, PR-AUC, and FPR on a held-out split, per vector, with a real interactive entity graph.",
+    },
+  ],
+};
+
+const OTHERS = [
   {
-    title: "Filterable attack taxonomy",
     tab: "Identify",
-    desc: "Browse 15 grounded vectors by channel, rail, social-engineering surface, or technique family — each with a cited 2026 source, not an assumption.",
-    span: "lg:col-span-2",
+    title: "Filterable attack taxonomy",
+    desc: "15 grounded vectors by channel, rail, social-engineering surface, or technique family — each with a cited 2026 source.",
   },
   {
-    title: "Entity-conditioned batch simulation",
-    tab: "Generate & Detect",
-    desc: "Generate labeled transaction batches where every entity carries persistent devices, IP, and spend history — so fraud rings show up as real graph motifs.",
-    span: "lg:col-span-1",
-  },
-  {
-    title: "Gemini narrative artifacts",
-    tab: "Generate & Detect",
-    desc: "See the qualitative side of each attack — phishing scripts, deepfake transcripts, injection payloads — generated live, or from deterministic fallbacks offline.",
-    span: "lg:col-span-1",
-  },
-  {
-    title: "Live fused-detector scoring",
-    tab: "Generate & Detect",
-    desc: "Precision, recall, F1, PR-AUC, and false-positive rate on a held-out split, broken down per attack vector, with per-transaction grounded explanations.",
-    span: "lg:col-span-2",
-  },
-  {
-    title: "Self-play arms-race chart",
     tab: "Self-Play Arms Race",
-    desc: "Run N rounds of escalating attacker evasion against a freshly retrained defender and watch the recall curve move in real time.",
-    span: "lg:col-span-1",
+    title: "Round-over-round arms race",
+    desc: "N rounds of escalating attacker evasion against a freshly retrained defender, recall tracked live.",
   },
   {
-    title: "Zero-day hypothesis generator",
     tab: "Zero-Day Discovery",
-    desc: "Cluster the detector's blind spot and get natural-language hypotheses for emerging patterns, ready to feed back into the taxonomy.",
-    span: "lg:col-span-1",
+    title: "Blind-spot hypothesis generator",
+    desc: "Clusters the detector's blind spot and drafts natural-language hypotheses, ready to feed back into the taxonomy.",
   },
 ];
 
 export default function FeatureGrid() {
   return (
-    <section id="features" className="max-w-6xl mx-auto px-6 py-20">
+    <section id="features" className="max-w-6xl mx-auto px-6 py-16 border-t" style={{ borderColor: "var(--border)" }}>
       <div className="max-w-2xl mb-10">
         <Eyebrow>In the console</Eyebrow>
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mt-2">Every feature is a working screen</h2>
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mt-2">Four tabs, each a working screen</h2>
         <p className="mt-3 text-sm md:text-base" style={{ color: "var(--muted)" }}>
-          No mockups — every card below links to a real, running part of the prototype.
+          No mockups — this mirrors the console&apos;s actual navigation. Generate &amp; Detect carries the core demo
+          action, so it leads.
         </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {FEATURES.map((f) => (
-          <Link
-            key={f.title}
-            href="/console"
-            className={`card-2 card-hover p-5 flex flex-col gap-2 hover:-translate-y-1 ${f.span}`}
-          >
-            <span className="pill w-fit" style={{ color: "var(--accent)", borderColor: "color-mix(in srgb, var(--accent) 35%, var(--border))" }}>
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--accent)" }} />
-              {f.tab}
-            </span>
-            <h3 className="font-medium text-sm mt-1">{f.title}</h3>
-            <p className="text-xs" style={{ color: "var(--muted)" }}>
-              {f.desc}
-            </p>
-            <span className="text-xs mt-auto pt-2" style={{ color: "var(--accent-2)" }}>
-              Open in console →
-            </span>
-          </Link>
-        ))}
+      <div style={{ border: "1px solid var(--border)" }}>
+        <Link href="/console" className="block p-5 card-hover" style={{ borderBottom: "1px solid var(--border)" }}>
+          <span className="eyebrow" style={{ color: "var(--accent)" }}>{CORE.tab}</span>
+          <div className="grid sm:grid-cols-3 gap-4 mt-3">
+            {CORE.items.map((item) => (
+              <div key={item.title}>
+                <h3 className="font-medium text-sm">{item.title}</h3>
+                <p className="text-xs mt-1" style={{ color: "var(--muted)" }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <span className="text-xs mt-3 inline-block" style={{ color: "var(--accent)" }}>Open in console →</span>
+        </Link>
+
+        <div className="grid md:grid-cols-3">
+          {OTHERS.map((o, i) => (
+            <Link
+              key={o.tab}
+              href="/console"
+              className="p-5 flex flex-col gap-2 card-hover"
+              style={{ borderLeft: i > 0 ? "1px solid var(--border)" : undefined }}
+            >
+              <span className="eyebrow" style={{ color: "var(--accent)" }}>{o.tab}</span>
+              <h3 className="font-medium text-sm">{o.title}</h3>
+              <p className="text-xs" style={{ color: "var(--muted)" }}>{o.desc}</p>
+              <span className="text-xs mt-auto pt-1" style={{ color: "var(--accent)" }}>Open in console →</span>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

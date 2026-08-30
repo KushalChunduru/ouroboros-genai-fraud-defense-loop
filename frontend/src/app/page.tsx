@@ -1,6 +1,5 @@
-import FramedHero from "@/components/landing/FramedHero";
-import StatsStrip from "@/components/landing/StatsStrip";
-import TaxonomyTicker from "@/components/landing/TaxonomyTicker";
+import Nav from "@/components/landing/Nav";
+import Hero from "@/components/landing/Hero";
 import ProblemSection from "@/components/landing/ProblemSection";
 import PillarsSection from "@/components/landing/PillarsSection";
 import LoopSection from "@/components/landing/LoopSection";
@@ -11,9 +10,8 @@ import FinalCTA from "@/components/landing/FinalCTA";
 export default function LandingPage() {
   return (
     <div className="flex-1 flex flex-col">
-      <FramedHero />
-      <StatsStrip />
-      <TaxonomyTicker />
+      <Nav />
+      <Hero />
       <ProblemSection />
       <PillarsSection />
       <LoopSection />

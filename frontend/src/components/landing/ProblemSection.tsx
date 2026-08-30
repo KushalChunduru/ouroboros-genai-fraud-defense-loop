@@ -7,7 +7,7 @@ const STATS = [
 
 export default function ProblemSection() {
   return (
-    <section id="problem" className="max-w-6xl mx-auto px-6 py-20">
+    <section id="problem" className="max-w-6xl mx-auto px-6 py-16 border-t" style={{ borderColor: "var(--border)" }}>
       <div className="max-w-2xl mb-10">
         <Eyebrow>The problem</Eyebrow>
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mt-2">
@@ -21,14 +21,12 @@ export default function ProblemSection() {
         </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: "var(--border)" }}>
         {STATS.map((s) => (
-          <div key={s.label} className="card-2 card-hover p-5 flex flex-col gap-2">
-            <span className="text-2xl md:text-3xl font-semibold" style={{ color: "var(--accent-2)" }}>
-              {s.value}
-            </span>
-            <span className="text-sm">{s.label}</span>
-            <span className="pill mt-auto w-fit">{s.sub}</span>
+          <div key={s.label} className="p-5 flex flex-col gap-2" style={{ background: "var(--background)" }}>
+            <span className="data text-2xl md:text-3xl font-semibold">{s.value}</span>
+            <span className="text-sm" style={{ color: "var(--foreground)" }}>{s.label}</span>
+            <span className="text-xs mt-auto" style={{ color: "var(--muted)" }}>{s.sub}</span>
           </div>
         ))}
       </div>
@@ -37,9 +35,5 @@ export default function ProblemSection() {
 }
 
 export function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--accent-2)" }}>
-      {children}
-    </span>
-  );
+  return <div className="eyebrow">{children}</div>;
 }

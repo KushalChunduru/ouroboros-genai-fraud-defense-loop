@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 import { api, DetectResponse, GenerateResponse } from "@/lib/api";
+import EntityGraph from "./EntityGraph";
 
-function MetricPill({ label, value, suffix = "", color = "var(--accent-2)" }: { label: string; value: number; suffix?: string; color?: string }) {
+function MetricPill({ label, value, suffix = "", color = "var(--accent)" }: { label: string; value: number; suffix?: string; color?: string }) {
   return (
-    <div className="card-2 card-hover px-4 py-3 flex-1 min-w-[110px] relative overflow-hidden">
+    <div className="card-2 px-4 py-3 flex-1 min-w-[110px] relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: color }} />
       <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>
         {label}
       </div>
-      <div className="text-2xl font-semibold mt-1" style={{ color }}>
+      <div className="data text-2xl font-semibold mt-1" style={{ color }}>
         {(value * 100).toFixed(1)}
         {suffix}
       </div>
@@ -71,7 +72,7 @@ export default function GenerateDetectConsole({ selected }: { selected: string[]
               type="number"
               value={nLegit}
               onChange={(e) => setNLegit(Number(e.target.value))}
-              className="block mt-1 card-2 px-3 py-1.5 rounded-md w-32"
+              className="data block mt-1 card-2 px-3 py-1.5 rounded-md w-32"
             />
           </label>
           <label className="text-sm">
@@ -80,37 +81,33 @@ export default function GenerateDetectConsole({ selected }: { selected: string[]
               type="number"
               value={nAttack}
               onChange={(e) => setNAttack(Number(e.target.value))}
-              className="block mt-1 card-2 px-3 py-1.5 rounded-md w-32"
+              className="data block mt-1 card-2 px-3 py-1.5 rounded-md w-32"
             />
           </label>
-          <button
-            onClick={runGenerate}
-            disabled={loading === "gen"}
-            className="btn-primary px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-60"
-          >
+          <button onClick={runGenerate} disabled={loading === "gen"} className="btn btn-solid">
             {loading === "gen" ? "Simulating…" : "Generate batch"}
           </button>
           {gen && (
-            <button
-              onClick={runDetect}
-              disabled={loading === "det"}
-              className="px-4 py-2 rounded-lg font-medium text-sm transition-transform hover:-translate-y-0.5 disabled:opacity-60"
-              style={{ background: "var(--accent-2)", color: "#04231c", boxShadow: "0 8px 24px -8px rgba(53,226,194,0.45)" }}
-            >
+            <button onClick={runDetect} disabled={loading === "det"} className="btn btn-ghost">
               {loading === "det" ? "Scoring…" : "Run fused detector"}
             </button>
           )}
         </div>
         {error && <p className="text-sm mt-3" style={{ color: "var(--danger)" }}>{error}</p>}
+        {!gen && !error && (
+          <p className="text-xs mt-3" style={{ color: "var(--muted)" }}>
+            Nothing simulated yet — set volumes above and generate a batch to see it here.
+          </p>
+        )}
       </div>
 
       {gen && (
         <div className="card p-5">
-          <h3 className="font-medium mb-2">Batch {gen.batch_id}</h3>
-          <div className="flex flex-wrap gap-3 text-sm mb-4">
-            <span className="pill">total {gen.counts.total}</span>
-            <span className="pill" style={{ color: "var(--accent-2)" }}>legit {gen.counts.legit}</span>
-            <span className="pill" style={{ color: "var(--danger)" }}>attack {gen.counts.attack}</span>
+          <h3 className="font-medium mb-2 data text-sm">{gen.batch_id}</h3>
+          <div className="flex flex-wrap gap-4 text-sm mb-4">
+            <span className="data">total {gen.counts.total}</span>
+            <span className="data" style={{ color: "var(--legit)" }}>legit {gen.counts.legit}</span>
+            <span className="data" style={{ color: "var(--danger)" }}>attack {gen.counts.attack}</span>
           </div>
           {gen.narratives_sample.length > 0 && (
             <>
@@ -130,14 +127,14 @@ export default function GenerateDetectConsole({ selected }: { selected: string[]
         </div>
       )}
 
-      {det && (
+      {det && gen && (
         <div className="card p-5 space-y-4">
           <h3 className="font-medium">Fused detector results (held-out test split)</h3>
           <div className="flex flex-wrap gap-3">
             <MetricPill label="Precision" value={det.overall.precision} suffix="%" color="var(--accent)" />
-            <MetricPill label="Recall" value={det.overall.recall} suffix="%" color="var(--accent-2)" />
+            <MetricPill label="Recall" value={det.overall.recall} suffix="%" color="var(--legit)" />
             <MetricPill label="F1" value={det.overall.f1} suffix="%" color="var(--accent)" />
-            <MetricPill label="PR-AUC" value={det.overall.pr_auc} suffix="%" color="var(--accent-2)" />
+            <MetricPill label="PR-AUC" value={det.overall.pr_auc} suffix="%" color="var(--legit)" />
             <MetricPill label="False positive rate" value={det.overall.false_positive_rate} suffix="%" color="var(--danger)" />
           </div>
 
@@ -159,16 +156,21 @@ export default function GenerateDetectConsole({ selected }: { selected: string[]
                     className="transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]"
                     style={{ borderTop: i === 0 ? "none" : "1px solid var(--border)" }}
                   >
-                    <td className="py-2 px-3 font-mono">{vid}</td>
-                    <td className="py-2 px-3">{(m.precision * 100).toFixed(0)}%</td>
-                    <td className="py-2 px-3">{(m.recall * 100).toFixed(0)}%</td>
-                    <td className="py-2 px-3">{(m.f1 * 100).toFixed(0)}%</td>
-                    <td className="py-2 px-3">{(m.false_positive_rate * 100).toFixed(1)}%</td>
+                    <td className="data py-2 px-3">{vid}</td>
+                    <td className="data py-2 px-3">{(m.precision * 100).toFixed(0)}%</td>
+                    <td className="data py-2 px-3">{(m.recall * 100).toFixed(0)}%</td>
+                    <td className="data py-2 px-3">{(m.f1 * 100).toFixed(0)}%</td>
+                    <td className="data py-2 px-3">{(m.false_positive_rate * 100).toFixed(1)}%</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          <h4 className="text-sm font-medium" style={{ color: "var(--muted)" }}>
+            Entity relationship graph
+          </h4>
+          <EntityGraph transactions={gen.transactions} scored={det.scored} />
 
           <h4 className="text-sm font-medium" style={{ color: "var(--muted)" }}>
             Top flagged transactions (grounded, attribution-based explanations)
@@ -184,7 +186,7 @@ export default function GenerateDetectConsole({ selected }: { selected: string[]
                   style={{ borderLeft: `2.5px solid ${s.is_attack ? "var(--danger)" : "var(--warn)"}` }}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono">{s.id}</span>
+                    <span className="data">{s.id}</span>
                     <span
                       className="pill"
                       style={{ background: s.is_attack ? "rgba(255,92,122,0.15)" : "rgba(255,180,84,0.15)", color: s.is_attack ? "var(--danger)" : "var(--warn)", borderColor: "transparent" }}

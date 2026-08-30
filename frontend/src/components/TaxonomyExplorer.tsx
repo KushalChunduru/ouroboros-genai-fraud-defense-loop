@@ -48,11 +48,9 @@ export default function TaxonomyExplorer({
                 setFilterAxis(a);
                 setFilterValue("all");
               }}
-              className={`px-3 py-1 rounded-full text-xs capitalize transition-all ${filterAxis === a ? "btn-primary" : ""}`}
-              style={{
-                background: filterAxis === a ? undefined : "var(--surface-2)",
-                color: filterAxis === a ? undefined : "var(--muted)",
-              }}
+              data-active={filterAxis === a}
+              className="segment capitalize"
+              style={{ background: filterAxis === a ? undefined : "var(--surface-2)" }}
             >
               {a.replace("_", " ")}
             </button>
@@ -81,7 +79,7 @@ export default function TaxonomyExplorer({
           {selected.length} selected for simulation ({filtered.length} shown)
         </span>
         <div className="flex gap-2">
-          <button className="text-xs underline" style={{ color: "var(--accent-2)" }} onClick={() => setSelected(vectors.map((v) => v.id))}>
+          <button className="text-xs underline" style={{ color: "var(--accent)" }} onClick={() => setSelected(vectors.map((v) => v.id))}>
             select all
           </button>
           <button className="text-xs underline" style={{ color: "var(--muted)" }} onClick={() => setSelected([])}>
@@ -95,8 +93,8 @@ export default function TaxonomyExplorer({
           <button
             key={v.id}
             onClick={() => toggle(v.id)}
-            className="card-2 card-hover p-4 text-left hover:-translate-y-0.5"
-            style={{ outline: selected.includes(v.id) ? "2px solid var(--accent)" : "none" }}
+            className="card-2 card-hover p-4 text-left"
+            style={{ borderColor: selected.includes(v.id) ? "var(--accent)" : undefined }}
           >
             <div className="flex items-start justify-between gap-2">
               <h3 className="font-medium text-sm leading-snug">{v.name}</h3>

@@ -4,6 +4,8 @@
 
 A closed-loop AI system that **identifies** emerging GenAI-powered payment fraud, **generates** high-fidelity simulations of it at scale, and **defends** against it with a fused detector — then runs the whole thing as a self-play arms race so the defense's blind spots automatically become new attack hypotheses.
 
+See [`docs/DESIGN.md`](docs/DESIGN.md) for the UI/UX research and decision log behind the frontend.
+
 ## Why this isn't a one-shot pipeline
 
 Most fraud-simulation projects generate a dataset once, train a classifier once, and report a score once. Ouroboros instead:

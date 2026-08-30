@@ -58,11 +58,17 @@ export default function SelfPlayDashboard({ selected }: { selected: string[] }) 
             Attack rows / vector
             <input type="number" value={nAttack} onChange={(e) => setNAttack(Number(e.target.value))} className="block mt-1 card-2 px-3 py-1.5 rounded-md w-32" />
           </label>
-          <button onClick={run} disabled={loading} className="btn-primary px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-60">
+          <button onClick={run} disabled={loading} className="btn btn-solid">
             {loading ? "Running rounds… (can take a minute)" : "Run self-play"}
           </button>
         </div>
         {error && <p className="text-sm mt-3" style={{ color: "var(--danger)" }}>{error}</p>}
+        {!chartData && !error && (
+          <p className="text-xs mt-3" style={{ color: "var(--muted)" }}>
+            No rounds run yet — each round simulates, trains, and evaluates fresh, so this can take up to a minute
+            for 5+ rounds.
+          </p>
+        )}
       </div>
 
       {chartData && (
@@ -76,7 +82,7 @@ export default function SelfPlayDashboard({ selected }: { selected: string[] }) 
                 <YAxis stroke="var(--muted)" fontSize={12} domain={[0, 100]} />
                 <Tooltip contentStyle={{ background: "var(--surface-2)", border: "1px solid var(--border)", fontSize: 12 }} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Line type="monotone" dataKey="avg detector recall" stroke="var(--accent-2)" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="avg detector recall" stroke="var(--legit)" strokeWidth={2} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="avg evasion level" stroke="var(--warn)" strokeWidth={2} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="false positive rate" stroke="var(--danger)" strokeWidth={2} dot={{ r: 3 }} />
               </LineChart>
