@@ -31,13 +31,50 @@ See [`docs/DESIGN.md`](docs/DESIGN.md) for the UI/UX research and decision log, 
 
 ## How this maps to the evaluation criteria
 
-| Criterion | Where it's answered |
-|---|---|
-| **Diversity of attacks identified** | 15 vectors spanning 4 *independent* axes — channel, rail, social-engineering surface, technique family (not a flat list) — so coverage is provably broad rather than anecdotal. Every vector is grounded in a named, hyperlinked 2026 source. See [`backend/app/taxonomy.json`](backend/app/taxonomy.json) and the [Identify page](#60-second-tour). |
-| **Fidelity of attacks in simulation** | Entity-conditioned simulator (persistent per-entity state, not row-independent), benchmarked *live* against a naive-shuffle baseline by the self-validating **Fidelity Lab** on whatever batch you just generated — not just a citation, a real measurement you can inspect. See [Why entity-conditioning isn't a nice-to-have](#why-entity-conditioning-isnt-a-nice-to-have). |
-| **Detection algorithms and their efficacy** | A *fused* detector — gradient-boosted tabular signal + graph-propagation risk + content-language signal — with real precision/recall/F1/PR-AUC/FPR reported per vector on a held-out split, cost-based threshold tuning (not a fixed 0.5 cutoff), and grounded explanations per flagged transaction. See [`app/defend/`](backend/app/defend/) and the [Generate & Detect page](#60-second-tour). |
-| **Novelty of the solution** | The two closed feedback loops are *implemented and measured live*, not asserted: a **self-play arms race** where the attacker escalates specifically against what the detector caught last round, and a **zero-day discovery agent** that mines the detector's own blind spot and proposes new attack hypotheses back into the taxonomy. The system's output becomes its next input — see [The loop](#the-loop). |
-| **Real-world feasibility in live payments** | Sub-100ms single-transaction scoring with *measured* server-side latency (not estimated), a cost-based threshold matching 2026 fraud-ops practice, a feature pipeline designed to point at real production transaction logs unmodified, and attack vectors (`agentic_checkout_hijack`, `agent_credential_exfil`) targeting the emerging agentic-commerce surface that has almost no public tooling yet. See [Real-world feasibility](#real-world-feasibility). |
+### Diversity of attacks identified
+
+15 vectors, tagged across **4 independent axes** — channel (IVR, agentic checkout, ATM, P2P wallet, e-commerce CNP...), rail, social-engineering surface (voice, video, chat, SMS, none), and technique family (deepfake impersonation, prompt-injection agent hijack, GenAI-scaled carding, synthetic identity, mule orchestration...) — so coverage is a provable cross-product, not a flat anecdotal list. Every vector carries a `severity_base` weight and a named, hyperlinked 2026 source (Visa PERC, Experian, TransUnion, FS-ISAC, HUMAN Security, Signifyd/Darwinium, Security Boulevard, or a peer-reviewed arXiv paper). The taxonomy also isn't static: the zero-day discovery agent (below) is designed to append new candidate vectors to it automatically.
+→ [`backend/app/taxonomy.json`](backend/app/taxonomy.json) · [Identify page](#60-second-tour)
+
+### Fidelity of attacks in simulation
+
+The simulator gives every entity **persistent state** (devices, IP, spend profile, session history) and conditions each new transaction on that entity's running history, instead of sampling rows independently like CTGAN/TVAE/GaussianCopula. That claim isn't just cited — it's benchmarked live by the **Fidelity Lab**, which builds a naive-shuffle baseline from your exact batch (independently shuffling `entity_id`, `device_id`, `ip_subnet`, and `timestamp` — mathematically identical to what a row-independent generator produces) and compares three real statistics between the two:
+
+- **Fano factor** (variance/mean of transaction counts per device per 10-minute window) — near 1 means memoryless/Poisson activity; well above 1 means coordinated bursts through shared infrastructure, which naive shuffling destroys.
+- **Single-owner-device fraction** — how much of the device graph resolves to one dominant entity, a fraud-ring signature naive shuffling erases.
+- **Velocity-rule exceed rate** — how often an entity crosses a same-day transaction-count threshold, the exact signal real velocity rules key on.
+
+→ [`backend/app/generate/fidelity.py`](backend/app/generate/fidelity.py) · [Why entity-conditioning isn't a nice-to-have](#why-entity-conditioning-isnt-a-nice-to-have)
+
+### Detection algorithms and their efficacy
+
+A **fused** detector, weighted `0.55` tabular + `0.30` graph + `0.15` content — not a single model:
+
+- **Tabular**: `HistGradientBoostingClassifier` (`max_depth=6`, `max_iter=150`, `learning_rate=0.08`) over engineered features (`log_amount`, `velocity_1h`, `device_fanout_raw`, `session_novelty`, `tool_call_burst`, `hour_of_day`).
+- **Graph**: risk seeded per entity/device/IP/merchant node, propagated 3 iterations across the shared-infrastructure graph with damping `0.6` — an entity looks risky if it's connected to known-risky infrastructure, even if its own transaction looks ordinary.
+- **Content**: a language-signal score over generated narrative text (phishing scripts, deepfake transcripts, injection payloads).
+
+Every run reports real precision/recall/F1/PR-AUC/false-positive-rate on a held-out split, broken down per vector — plus **cost-based threshold tuning** (fraud-ops sets the decision cutoff to minimize `missed-fraud cost + false-decline cost`, not a fixed 0.5) computed live from scores already returned, and grounded, attribution-based explanations per flagged transaction.
+→ [`backend/app/defend/`](backend/app/defend/) · [Generate & Detect page](#60-second-tour)
+
+### Novelty of the solution
+
+Two closed feedback loops, both implemented and measured live rather than asserted in a slide:
+
+- **Self-play arms race** — each round, the attacker escalates evasion by a fixed step (`+0.18`, capped at `1.0`) specifically on the vectors the *previous* round's detector caught best, then a **fresh detector is retrained** on a new held-out split and re-evaluated. The round-over-round recall curve is the demoable evidence that detection holds (or doesn't) under an adaptive adversary.
+- **Zero-day discovery** — mines exactly the transactions the current detector scores below the decision threshold (its blind spot), runs `IsolationForest` to surface the most anomalous of those, clusters them (a from-scratch NumPy k-means, up to 3 clusters), and asks an LLM to draft a natural-language attack hypothesis per cluster from real cluster statistics (size, mean amount, dominant channel/category, device fan-out, session novelty) — ready to feed back into the taxonomy.
+
+The system's own output becomes its next input, twice. See [The loop](#the-loop) and [`backend/app/loop/`](backend/app/loop/).
+
+### Real-world feasibility in live payments
+
+- **Measured, not estimated, latency**: single-transaction scoring reports server-side latency via `time.perf_counter()` around the real inference call — typically 10–30ms, against a sub-100ms industry target for an inline authorization-path check.
+- **A feature pipeline built to point at real logs unmodified**: the tabular+graph+content fusion mirrors the shape of production fraud platforms (sequence/transformer signal plus relationship-graph signal, not a plain row classifier) — see [`app/defend/features.py`](backend/app/defend/features.py) and [`app/defend/graph_model.py`](backend/app/defend/graph_model.py).
+- **Cost-aware decisioning**, matching how 2026 fraud-ops teams actually set thresholds, not textbook accuracy-maximizing.
+- **Attack vectors aimed at where the surface is actually moving**: `agentic_checkout_hijack` and `agent_credential_exfil` model AI-shopping-agent hijacking and credential exfiltration via tool poisoning — the agentic-commerce fraud surface card networks and AI labs are jointly exposing via agent-commerce protocols in 2026, with almost no public detection tooling yet.
+- **A pre-production stress-testing story, not just a detector**: a bank could run *N* self-play rounds against a candidate detector before shipping it, and route zero-day hypotheses into an analyst review queue instead of auto-updating the taxonomy unsupervised.
+
+→ [Real-world feasibility](#real-world-feasibility)
 
 ---
 
