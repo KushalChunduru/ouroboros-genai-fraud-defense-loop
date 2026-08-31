@@ -39,6 +39,16 @@ export function IconLoop({ color }: { color: string }) {
   );
 }
 
+export function IconReport({ color }: { color: string }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 3h9l4 4v14H6z" />
+      <path d="M14 3v5h5" />
+      <path d="M9 13h6M9 17h6M9 9h2" />
+    </svg>
+  );
+}
+
 export function IconMicroscope({ color }: { color: string }) {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

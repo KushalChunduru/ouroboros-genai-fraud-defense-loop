@@ -26,14 +26,15 @@ export default function Hero() {
         <div className="eyebrow mb-5">Mastercard Innovation Challenge · GFF 2026</div>
 
         <h1 className="text-5xl md:text-7xl font-semibold tracking-tighter leading-[0.98]">
-          The attack and the defense, trained in{" "}
-          <span className="text-gradient">the same loop</span>.
+          The attack and the defense, trained in the same loop
+          <span className="headline-dot" aria-hidden="true" />
         </h1>
 
         <p className="mt-5 text-base md:text-lg max-w-xl mx-auto" style={{ color: "var(--muted)" }}>
-          Ouroboros identifies emerging GenAI-powered payment fraud, simulates it with entity-level fidelity at
-          scale, and defends against it with a fused detector — then runs the whole system as a self-play arms
-          race so the defense&apos;s own blind spots become tomorrow&apos;s attack hypotheses.
+          Ouroboros <span className="hl">identifies</span> emerging GenAI-powered payment fraud,{" "}
+          <span className="hl-violet">simulates</span> it with entity-level fidelity at scale, and{" "}
+          <span className="hl">defends</span> against it with a fused detector — then runs the whole system as a{" "}
+          self-play arms race so the defense&apos;s own blind spots become tomorrow&apos;s attack hypotheses.
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-3 mt-8">

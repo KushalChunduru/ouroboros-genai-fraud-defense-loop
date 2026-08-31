@@ -17,7 +17,7 @@ export default function StageRail({ stages }: { stages: Stage[] }) {
   }, []);
 
   return (
-    <div className="sticky top-0 z-10 border-b" style={{ borderColor: "var(--border)", background: "var(--background)" }}>
+    <div className="lg:hidden sticky top-0 z-10 border-b" style={{ borderColor: "var(--border)", background: "var(--background)" }}>
       <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3 md:gap-6">
         <Link href="/" className="flex items-center gap-2.5 order-1 shrink-0">
           <OuroborosMark size={18} />

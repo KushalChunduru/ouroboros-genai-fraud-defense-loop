@@ -1,22 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  /* Surface & text: bright fintech-dashboard palette -- tonal elevation
-     carries depth via soft shadow + hairline border, not blur/glow. */
-  --background: #f5f6fb;
+  /* Surface & text: VERDE-style wealth-platform palette -- a cool
+     lavender-white base, tonal elevation via soft shadow + hairline
+     border, not blur/glow. */
+  --background: #eef1fb;
   --surface: #ffffff;
-  --surface-2: #f0f1f8;
-  --border: #e2e4f0;
-  --border-strong: #cacde3;
-  --foreground: #12142b;
-  --muted: #666a89;
+  --surface-2: #f2f4fb;
+  --border: #e2e5f5;
+  --border-strong: #c9cee6;
+  --foreground: #0e1020;
+  --muted: #6b6f89;
 
   /* Semantic data colors: each has ONE meaning, used only where that
-     meaning applies (interactive/legit/fraud/uncertain) -- never decorative.
-     Deepened from the dark-theme values so each holds AA contrast on white. */
-  --accent: #0d8f82;   /* interactive: links, primary actions, active state -- warm trust-teal */
-  --accent-2: #f2790c; /* secondary accent -- warm coral/orange, gradient + illustration partner */
-  --legit: #16825f;    /* legitimate / recall / "caught correctly" */
+     meaning applies (interactive/legit/fraud/uncertain) -- never decorative. */
+  --accent: #159a6b;   /* interactive: links, primary actions, active state -- VERDE mint */
+  --accent-2: #6f5cf5; /* secondary accent -- violet, gradient + AI-confidence partner */
+  --accent-3: #2f7de0; /* tertiary accent -- blue, sparingly (allocation/indices) */
+  --legit: #159a6b;    /* legitimate / recall / "caught correctly" */
   --danger: #d61f56;   /* attack / fraud / false positive */
   --warn: #b3690a;     /* severity / uncertainty / needs review */
 
@@ -199,7 +200,7 @@ button:focus-visible {
 .block-teal {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #0a6e64, var(--accent) 55%, #12a695);
+  background: linear-gradient(135deg, #0c6b48, var(--accent) 55%, #1fbf82);
   color: #f2fffb;
 }
 .block-teal .mesh-muted {
@@ -236,6 +237,40 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   border-radius: 999px;
+}
+
+/* Inline keyword emphasis -- the VERDE-reference technique of coloring
+   specific words within a sentence (not whole-line gradient), used in body
+   copy to draw the eye to the claim that matters. */
+.hl {
+  color: var(--accent);
+  font-weight: 600;
+}
+.hl-violet {
+  color: var(--accent-2);
+  font-weight: 600;
+}
+
+/* Headline square -- a small colored square standing in for the closing
+   period on a big display headline, the reference's signature sign-off. */
+.headline-dot {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-left: 0.08em;
+  background: var(--accent);
+  vertical-align: baseline;
+  transform: translateY(-0.08em);
+}
+
+/* Soft wash: a barely-there multi-hue radial field behind dashboard
+   content -- the reference's ambient backdrop for data-dense screens.
+   Never opaque enough to fight the data sitting on top of it. */
+.wash-soft {
+  background:
+    radial-gradient(38% 45% at 15% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(34% 40% at 85% 10%, color-mix(in srgb, var(--accent-2) 14%, transparent), transparent 70%),
+    radial-gradient(30% 35% at 50% 100%, color-mix(in srgb, var(--accent-3) 10%, transparent), transparent 70%);
 }
 
 /* Outlined numbered badge -- a ring, not a filled disc. Lighter, more
