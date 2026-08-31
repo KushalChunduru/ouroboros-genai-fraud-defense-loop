@@ -1,3 +1,4 @@
+import os
 import random
 import time
 import uuid
@@ -21,9 +22,17 @@ from app.store import store
 
 app = FastAPI(title="Ouroboros — GenAI Payment Fraud Red/Blue Loop", version="0.1.0")
 
+# Deployment-friendly: defaults cover local dev + the deployed Vercel frontend,
+# and ALLOWED_ORIGINS (comma-separated) lets a new frontend origin be added
+# without a code change.
+_default_origins = [
+    "http://localhost:3000",
+    "https://ouroboros-genai-fraud-defense-loop.vercel.app",
+]
+_extra_origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=_default_origins + _extra_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
