@@ -1,17 +1,23 @@
 const {
   Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell,
-  WidthType, ShadingType, BorderStyle, AlignmentType, LevelFormat, convertInchesToTwip,
+  WidthType, ShadingType, BorderStyle, AlignmentType, LevelFormat, PageBreak,
+  TableOfContents, Header, Footer, PageNumber, VerticalAlign,
 } = require("docx");
 
 const PAGE = { width: 12240, height: 15840 }; // US Letter
-const ACCENT = "5B3DF5";
+const MARGIN = { top: 1080, bottom: 1080, left: 1080, right: 1080 };
+const ACCENT = "5B3DF5";   // violet — primary
+const ACCENT2 = "0D8F72";  // teal — secondary, "generate/defend" accent
+const INK = "111827";
 const MUTED = "6B7280";
+const TINT = "F3F1FE";     // pale violet card fill
+const TINT2 = "ECFDF5";    // pale teal card fill
 
 function h1(text) {
-  return new Paragraph({ text, heading: HeadingLevel.HEADING_1, spacing: { before: 320, after: 160 } });
+  return new Paragraph({ text, heading: HeadingLevel.HEADING_1 });
 }
 function h2(text) {
-  return new Paragraph({ text, heading: HeadingLevel.HEADING_2, spacing: { before: 240, after: 120 } });
+  return new Paragraph({ text, heading: HeadingLevel.HEADING_2 });
 }
 function p(text, opts = {}) {
   return new Paragraph({ children: [new TextRun({ text, ...opts })], spacing: { after: 140 } });
@@ -26,8 +32,46 @@ function bullet(text, opts = {}) {
 function hr() {
   return new Paragraph({
     text: "",
-    border: { bottom: { color: "CCCCCC", space: 1, style: BorderStyle.SINGLE, size: 6 } },
+    border: { bottom: { color: "D1D5DB", space: 1, style: BorderStyle.SINGLE, size: 6 } },
     spacing: { after: 200 },
+  });
+}
+function pageBreak() {
+  return new Paragraph({ children: [new PageBreak()] });
+}
+
+/** A left-accent highlighted note — for the moments worth slowing down on
+ * (an honest negative result, a closing synthesis) instead of plain italics. */
+function pullQuote(text, { accent = ACCENT, fill = TINT } = {}) {
+  return new Paragraph({
+    children: [new TextRun({ text, italics: true, color: INK, size: 20 })],
+    shading: { type: ShadingType.CLEAR, color: "auto", fill },
+    border: { left: { color: accent, space: 8, style: BorderStyle.SINGLE, size: 24 } },
+    spacing: { before: 160, after: 220 },
+    indent: { left: 40 },
+  });
+}
+
+/** One "at a glance" stat tile: label / big number / one-line context. */
+function statTile(label, value, sub, { accent = ACCENT, fill = TINT, width } = {}) {
+  return new TableCell({
+    width: { size: width, type: WidthType.DXA },
+    shading: { type: ShadingType.CLEAR, color: "auto", fill },
+    margins: { top: 180, bottom: 180, left: 180, right: 180 },
+    verticalAlign: VerticalAlign.CENTER,
+    children: [
+      new Paragraph({ children: [new TextRun({ text: label.toUpperCase(), bold: true, color: accent, size: 15 })], spacing: { after: 60 } }),
+      new Paragraph({ children: [new TextRun({ text: value, bold: true, color: INK, size: 34 })], spacing: { after: 40 } }),
+      new Paragraph({ children: [new TextRun({ text: sub, color: MUTED, size: 16 })] }),
+    ],
+  });
+}
+function statsRow(tiles) {
+  const width = Math.floor(10400 / tiles.length);
+  return new Table({
+    width: { size: 10400, type: WidthType.DXA },
+    columnWidths: tiles.map(() => width),
+    rows: [new TableRow({ children: tiles.map((t) => statTile(t.label, t.value, t.sub, { ...t, width })) })],
   });
 }
 
@@ -35,11 +79,24 @@ function cell(text, { header = false, width = 2000, shade = null } = {}) {
   return new TableCell({
     width: { size: width, type: WidthType.DXA },
     shading: shade ? { type: ShadingType.CLEAR, color: "auto", fill: shade } : undefined,
+    margins: { top: 100, bottom: 100, left: 120, right: 120 },
     children: [
       new Paragraph({
         children: [new TextRun({ text, bold: header, size: header ? 19 : 18, color: header ? "FFFFFF" : "1F2937" })],
       }),
     ],
+  });
+}
+
+function dataTable(rows, widths) {
+  return new Table({
+    width: { size: 10400, type: WidthType.DXA },
+    columnWidths: widths,
+    rows: rows.map((r, i) =>
+      new TableRow({
+        children: r.map((t, j) => cell(t, { header: i === 0, width: widths[j], shade: i === 0 ? ACCENT : (i % 2 === 0 ? "F3F4F6" : null) })),
+      })
+    ),
   });
 }
 
@@ -62,16 +119,7 @@ function taxonomyTable() {
     ["Deepfake ATM/branch liveness bypass", "ATM / branch", "Deepfake impersonation", "Security Boulevard 2026"],
     ["GenAI-assisted SIM-swap wallet takeover", "P2P wallet", "GenAI social engineering", "2026 identity-threat reporting"],
   ];
-  const widths = [3600, 1900, 2200, 2700];
-  return new Table({
-    width: { size: 10400, type: WidthType.DXA },
-    columnWidths: widths,
-    rows: rows.map((r, i) =>
-      new TableRow({
-        children: r.map((t, j) => cell(t, { header: i === 0, width: widths[j], shade: i === 0 ? ACCENT : (i % 2 === 0 ? "F3F4F6" : null) })),
-      })
-    ),
-  });
+  return dataTable(rows, [3600, 1900, 2200, 2700]);
 }
 
 function metricsTable() {
@@ -83,14 +131,7 @@ function metricsTable() {
     ["PR-AUC", "99.8%"],
     ["False positive rate (legit traffic)", "3.6%"],
   ];
-  const widths = [5200, 5200];
-  return new Table({
-    width: { size: 10400, type: WidthType.DXA },
-    columnWidths: widths,
-    rows: rows.map((r, i) =>
-      new TableRow({ children: r.map((t, j) => cell(t, { header: i === 0, width: widths[j], shade: i === 0 ? ACCENT : (i % 2 === 0 ? "F3F4F6" : null) })) })
-    ),
-  });
+  return dataTable(rows, [5200, 5200]);
 }
 
 function fidelityTable() {
@@ -100,14 +141,7 @@ function fidelityTable() {
     ["Single-owner device fraction", "81% – 84%", "50% – 54%", "~1.6×"],
     ["Velocity-rule trigger rate (>4 txn/hr/device)", "1.5% – 2.8%", "1.0% – 1.6%", "~1.4–2.4×"],
   ];
-  const widths = [4200, 2100, 2600, 1500];
-  return new Table({
-    width: { size: 10400, type: WidthType.DXA },
-    columnWidths: widths,
-    rows: rows.map((r, i) =>
-      new TableRow({ children: r.map((t, j) => cell(t, { header: i === 0, width: widths[j], shade: i === 0 ? ACCENT : (i % 2 === 0 ? "F3F4F6" : null) })) })
-    ),
-  });
+  return dataTable(rows, [4200, 2100, 2600, 1500]);
 }
 
 function feasibilityTable() {
@@ -117,14 +151,7 @@ function feasibilityTable() {
     ["Threshold reflects business cost, not a fixed cutoff", "Interactive tuner recomputes precision/recall/F1/FPR/estimated-cost live from held-out scores as cost assumptions change; on one real run, moving to the cost-optimal threshold cut estimated cost from $6,000 to $1,560"],
     ["Results are shareable, not locked in a session", "Every scored batch gets a standalone permalink (/console/report/{batch_id}) a reviewer can open independently, without re-running the pipeline"],
   ];
-  const widths = [3800, 6600];
-  return new Table({
-    width: { size: 10400, type: WidthType.DXA },
-    columnWidths: widths,
-    rows: rows.map((r, i) =>
-      new TableRow({ children: r.map((t, j) => cell(t, { header: i === 0, width: widths[j], shade: i === 0 ? ACCENT : (i % 2 === 0 ? "F3F4F6" : null) })) })
-    ),
-  });
+  return dataTable(rows, [3800, 6600]);
 }
 
 function pipelineTable() {
@@ -138,34 +165,117 @@ function pipelineTable() {
     ["Loop — 1", "Self-play arms race", "N rounds of adaptive-evasion attacker vs. freshly retrained defender; tracks round-over-round recall"],
     ["Loop — 2", "Zero-day discovery agent", "Isolation Forest + clustering restricted to the defender's blind spot; LLM drafts new attack hypotheses"],
   ];
-  const widths = [1700, 3200, 5500];
-  return new Table({
-    width: { size: 10400, type: WidthType.DXA },
-    columnWidths: widths,
-    rows: rows.map((r, i) =>
-      new TableRow({ children: r.map((t, j) => cell(t, { header: i === 0, width: widths[j], shade: i === 0 ? ACCENT : (i % 2 === 0 ? "F3F4F6" : null) })) })
-    ),
-  });
+  return dataTable(rows, [1700, 3200, 5500]);
 }
+
+const header = new Header({
+  children: [
+    new Paragraph({
+      alignment: AlignmentType.RIGHT,
+      border: { bottom: { color: "E5E7EB", space: 4, style: BorderStyle.SINGLE, size: 4 } },
+      children: [
+        new TextRun({ text: "OUROBOROS", bold: true, color: ACCENT, size: 14 }),
+        new TextRun({ text: "  ·  Solution Walkthrough", color: MUTED, size: 14 }),
+      ],
+    }),
+  ],
+});
+
+const footer = new Footer({
+  children: [
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      border: { top: { color: "E5E7EB", space: 4, style: BorderStyle.SINGLE, size: 4 } },
+      children: [
+        new TextRun({ text: "Mastercard Innovation Challenge @ GFF 2026", color: MUTED, size: 14 }),
+        new TextRun({ text: "   ·   Page ", color: MUTED, size: 14 }),
+        new TextRun({ children: [PageNumber.CURRENT], color: MUTED, size: 14 }),
+        new TextRun({ text: " of ", color: MUTED, size: 14 }),
+        new TextRun({ children: [PageNumber.TOTAL_PAGES], color: MUTED, size: 14 }),
+      ],
+    }),
+  ],
+});
 
 const doc = new Document({
   numbering: {
     config: [{ reference: "bullets", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 420, hanging: 260 } } } }] }],
   },
+  styles: {
+    default: {
+      document: { run: { font: "Calibri", size: 20, color: INK } },
+    },
+    paragraphStyles: [
+      {
+        id: "Title", name: "Title", basedOn: "Normal", next: "Normal", quickFormat: true,
+        run: { size: 72, bold: true, color: ACCENT, font: "Calibri" },
+        paragraph: { spacing: { after: 80 } },
+      },
+      {
+        id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true,
+        run: { size: 30, bold: true, color: INK, font: "Calibri" },
+        paragraph: {
+          spacing: { before: 420, after: 200 },
+          border: { bottom: { color: ACCENT, space: 6, style: BorderStyle.SINGLE, size: 8 } },
+        },
+      },
+      {
+        id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true,
+        run: { size: 23, bold: true, color: ACCENT2, font: "Calibri" },
+        paragraph: { spacing: { before: 280, after: 140 } },
+      },
+    ],
+  },
   sections: [
     {
-      properties: { page: { size: PAGE, margin: { top: 1080, bottom: 1080, left: 1080, right: 1080 } } },
+      properties: { page: { size: PAGE, margin: MARGIN } },
       children: [
+        // ---------- Cover page ----------
+        new Paragraph({ spacing: { before: 2000 } }),
+        new Paragraph({
+          border: { bottom: { color: ACCENT, space: 12, style: BorderStyle.SINGLE, size: 36 } },
+          spacing: { after: 360 },
+          children: [new TextRun({ text: "  ", size: 4 })],
+        }),
         new Paragraph({ text: "Ouroboros", heading: HeadingLevel.TITLE, spacing: { after: 80 } }),
         new Paragraph({
-          children: [new TextRun({ text: "A Closed-Loop AI System for GenAI-Era Payment Fraud", size: 28, color: MUTED })],
+          children: [new TextRun({ text: "The attack and the defense, trained in the same loop.", size: 26, color: INK, italics: true })],
+          spacing: { after: 260 },
+        }),
+        new Paragraph({
+          children: [new TextRun({ text: "A closed-loop AI system for GenAI-era payment fraud — Identify, Generate, Defend, closed twice.", size: 21, color: MUTED })],
+          spacing: { after: 500 },
+        }),
+        statsRow([
+          { label: "Attack vectors", value: "15", sub: "4 independent axes, all sourced", accent: ACCENT, fill: TINT },
+          { label: "Fused detector F1", value: "97.1%", sub: "held-out test split", accent: ACCENT2, fill: TINT2 },
+          { label: "Live scoring latency", value: "12–65ms", sub: "measured, sub-100ms target", accent: ACCENT, fill: TINT },
+        ]),
+        new Paragraph({ spacing: { before: 700 } }),
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          children: [new TextRun({ text: "Solution Walkthrough", bold: true, size: 22, color: INK })],
           spacing: { after: 40 },
         }),
         new Paragraph({
-          children: [new TextRun({ text: "Mastercard Innovation Challenge @ GFF 2026 — Solution Walkthrough", size: 22, color: MUTED, italics: true })],
-          spacing: { after: 400 },
+          children: [new TextRun({ text: "Mastercard Innovation Challenge @ GFF 2026", size: 20, color: MUTED })],
+          spacing: { after: 20 },
         }),
+        new Paragraph({
+          children: [new TextRun({ text: "github.com/KushalChunduru/ouroboros-genai-fraud-defense-loop", size: 20, color: ACCENT })],
+        }),
+        pageBreak(),
 
+        // ---------- Table of contents ----------
+        new Paragraph({ text: "Table of Contents", heading: HeadingLevel.HEADING_1 }),
+        new TableOfContents("Contents", { hyperlink: true, headingStyleRange: "1-2" }),
+        new Paragraph({
+          children: [new TextRun({ text: "(In Word: right-click the table above and choose \"Update Field\" to populate page numbers.)", italics: true, color: MUTED, size: 16 })],
+          spacing: { before: 200 },
+        }),
+        pageBreak(),
+
+        // ---------- Body ----------
         h1("1. Executive Summary"),
         p(
           "Ouroboros is an end-to-end red-team/blue-team AI system covering all three pillars of the challenge — Identify, Generate, Defend — implemented as an actual closed loop rather than a linear pipeline. It identifies 15 grounded GenAI-era payment-fraud attack vectors across four independent axes, simulates them with an entity-conditioned behavioral generator designed to avoid a documented failure mode of naive tabular generators, defends against them with a fused tabular + graph + content detector, and runs the whole system as a self-play arms race whose blind spots are automatically converted into new attack hypotheses by a zero-day discovery agent."
@@ -176,7 +286,7 @@ const doc = new Document({
 
         h1("2. Pillar 1 — Identify: A Living, Grounded Taxonomy"),
         p(
-          "Rather than a short anecdotal list, the taxonomy tags every vector across four independent axes — channel, payment rail, social-engineering surface, and technique family — so coverage is provably broad. Each vector is grounded in a specific 2026 industry or academic source rather than invented from first principles, and every one of those 15 citations was individually verified by live web search and is rendered as a real, working hyperlink in the console rather than an italicized name — one citation that could not be independently verified during that pass was corrected rather than left in. The taxonomy is implemented as living data (backend/app/taxonomy.json) that the Zero-Day Discovery agent (Section 4.2) can append to automatically."
+          "Rather than a short anecdotal list, the taxonomy tags every vector across four independent axes — channel, payment rail, social-engineering surface, and technique family — so coverage is provably broad. Each vector is grounded in a specific 2026 industry or academic source rather than invented from first principles, and every one of those 15 citations was individually verified by live web search and is rendered as a real, working hyperlink in the console rather than an italicized name — one citation that could not be independently verified during that pass was corrected rather than left in. The taxonomy is implemented as living data (backend/app/taxonomy.json) that the Zero-Day Discovery agent (Section 4.3) can append to automatically."
         ),
         taxonomyTable(),
         p(""),
@@ -206,7 +316,7 @@ const doc = new Document({
         ),
         fidelityTable(),
         p(""),
-        p(
+        pullQuote(
           "One result was not the one hypothesized going in, and is reported here rather than adjusted away: an initial device-fan-out Gini metric moved in the opposite direction expected. Investigating why surfaced a more interesting finding than originally assumed — naive shuffling does not just fail to fabricate fraud rings well, it corrupts the legitimate class: a real customer's repeat visits to their own device get scattered across many fake owners, so an ordinary loyal customer starts looking exactly like a fraud ring. The single-owner-device-fraction metric above measures that effect directly and was verified directionally stable across three independent random seeds on realistic 1,000-row batches before being shipped."
         ),
 
@@ -272,9 +382,9 @@ const doc = new Document({
         p(""),
         feasibilityTable(),
         p(""),
-        p(
+        pullQuote(
           "Stated plainly rather than glossed over: the prototype's data store is process-local and in-memory, appropriate for a demo, not a production deployment — a real deployment would back batches, trained models, and reports with a real datastore and per-session isolation. This is called out explicitly in the codebase (backend/app/store.py) and was the subject of a concrete fix during development: detectors are now keyed by batch_id rather than a single 'last trained' pointer, so that scoring two different batches in the same process session does not silently corrupt each other's results — verified with two real batches scored back to back.",
-          { italics: true, color: MUTED, size: 18 }
+          { accent: ACCENT2, fill: TINT2 }
         ),
 
         h1("9. Novelty Summary"),
@@ -285,6 +395,8 @@ const doc = new Document({
         hr(),
         p("Full source: github.com/KushalChunduru/ouroboros-genai-fraud-defense-loop — organized, documented, and reproducible per the README's setup instructions. Every file, endpoint, and citation referenced throughout this document lives in that repository.", { italics: true, color: MUTED, size: 18 }),
       ],
+      headers: { default: header },
+      footers: { default: footer },
     },
   ],
 });
