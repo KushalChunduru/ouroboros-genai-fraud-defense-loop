@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import { DetectResponse, GenerateResponse, SelfPlayRound, ZeroDayHypothesis } from "@/lib/api";
 import type { Stage } from "./StageRail";
 
@@ -19,15 +19,48 @@ type ConsoleState = {
 
 const ConsoleCtx = createContext<ConsoleState | null>(null);
 
+const STORAGE_KEY = "ouroboros-console-run";
+
+type Persisted = {
+  selected: string[];
+  gen: GenerateResponse | null;
+  det: DetectResponse | null;
+  selfPlay: SelfPlayRound[] | null;
+  zeroDay: ZeroDayHypothesis[] | null;
+};
+
+function loadPersisted(): Persisted | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Persisted) : null;
+  } catch {
+    return null;
+  }
+}
+
 /* Lives in the /console layout, so it survives client-side navigation
    between the five stage pages -- splitting the workflow into separate
-   routes for usability shouldn't mean losing the run each page feeds. */
+   routes for usability shouldn't mean losing the run each page feeds.
+   Also mirrored to sessionStorage: these are now real, bookmarkable URLs,
+   so a direct visit or refresh of e.g. /console/summary needs the same
+   run data a client-side Link click would have carried, not an empty
+   "run Generate & Detect first" state. */
 export function ConsoleProvider({ children }: { children: ReactNode }) {
-  const [selected, setSelected] = useState<string[]>([]);
-  const [gen, setGen] = useState<GenerateResponse | null>(null);
-  const [det, setDet] = useState<DetectResponse | null>(null);
-  const [selfPlay, setSelfPlay] = useState<SelfPlayRound[] | null>(null);
-  const [zeroDay, setZeroDay] = useState<ZeroDayHypothesis[] | null>(null);
+  const [selected, setSelected] = useState<string[]>(() => loadPersisted()?.selected ?? []);
+  const [gen, setGen] = useState<GenerateResponse | null>(() => loadPersisted()?.gen ?? null);
+  const [det, setDet] = useState<DetectResponse | null>(() => loadPersisted()?.det ?? null);
+  const [selfPlay, setSelfPlay] = useState<SelfPlayRound[] | null>(() => loadPersisted()?.selfPlay ?? null);
+  const [zeroDay, setZeroDay] = useState<ZeroDayHypothesis[] | null>(() => loadPersisted()?.zeroDay ?? null);
+
+  useEffect(() => {
+    const persisted: Persisted = { selected, gen, det, selfPlay, zeroDay };
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
+    } catch {
+      // storage full or unavailable (private browsing) -- state still works in-memory
+    }
+  }, [selected, gen, det, selfPlay, zeroDay]);
 
   const setResult = (g: GenerateResponse | null, d: DetectResponse | null) => {
     setGen(g);
