@@ -135,14 +135,17 @@ button:focus-visible {
   font-weight: 500;
   transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
+/* VERDE reference detail: the primary action color is near-black, not the
+   brand accent -- green is reserved for positive data (gains, "done",
+   confidence), never spent on button chrome. */
 .btn-solid {
-  background: var(--accent);
-  color: white;
-  box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--accent) 55%, transparent);
+  background: var(--foreground);
+  color: var(--surface);
+  box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--foreground) 40%, transparent);
 }
 .btn-solid:hover {
-  background: color-mix(in srgb, var(--accent) 88%, black 12%);
-  box-shadow: 0 8px 20px -6px color-mix(in srgb, var(--accent) 65%, transparent);
+  background: color-mix(in srgb, var(--foreground) 85%, white 15%);
+  box-shadow: 0 8px 20px -6px color-mix(in srgb, var(--foreground) 50%, transparent);
   transform: translateY(-1px);
 }
 .btn-solid:disabled {
@@ -192,19 +195,23 @@ button:focus-visible {
   color: transparent;
 }
 
-/* Block-teal: the one deliberately loud surface in the system -- a solid
-   trust-teal band, not a dark panel. Matches the friendly fintech-aggregator
-   reference's bold color-block CTA ("everything starts and ends with you").
-   Used as a reward moment (landing final CTA, console run summary), never as
-   page background. White text only inside this surface. */
+/* Reward surface: VERDE never uses a solid dark color block -- every
+   colorful panel in the reference (the allocation card, the closing CTA)
+   is a light mesh gradient bleeding to white with DARK text on top, plus
+   a black button, never white text on a saturated fill. Used as a reward
+   moment (landing final CTA, console run summary), never as page bg. */
 .block-teal {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #0c6b48, var(--accent) 55%, #1fbf82);
-  color: #f2fffb;
+  background-color: #fbfdfb;
+  background-image:
+    radial-gradient(110% 140% at 0% 0%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 60%),
+    radial-gradient(100% 130% at 100% 15%, color-mix(in srgb, var(--accent-2) 22%, transparent), transparent 58%),
+    radial-gradient(90% 120% at 50% 110%, color-mix(in srgb, var(--accent-3) 18%, transparent), transparent 55%);
+  color: var(--foreground);
 }
 .block-teal .mesh-muted {
-  color: rgba(242, 255, 251, 0.78);
+  color: var(--muted);
 }
 
 /* Light mesh: the hero band -- a saturated color pool bleeding to white,
@@ -215,19 +222,6 @@ button:focus-visible {
   background-image:
     radial-gradient(85% 130% at 8% -10%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 62%),
     radial-gradient(70% 110% at 100% -20%, color-mix(in srgb, var(--accent-2) 22%, transparent), transparent 58%);
-}
-
-/* Problem/solution duet: two soft pastel tiles, warm-to-cool pairing --
-   lifted from the reference's "problem we found / system we built" flow,
-   translated into the reference's light, illustration-forward palette
-   rather than a dark panel. Dark text throughout, tinted icon dots. */
-.tile-coral {
-  background: linear-gradient(165deg, #fff1ea, #ffe3d6);
-  border: 1px solid #ffd2ba;
-}
-.tile-teal {
-  background: linear-gradient(165deg, #e9fbf6, #d7f5ec);
-  border: 1px solid #b7e8da;
 }
 
 /* Circular tinted icon badge -- the reference's soft-bubble icon treatment,

@@ -7,11 +7,8 @@ const STATS = [
   { value: "24–39×", label: "worse behavioral fidelity, naive GAN data", sub: "arXiv:2604.13125, 2026" },
 ];
 
-const FIXES = [
-  { label: "Living taxonomy", text: "15 attack vectors, each grounded in a named 2026 source — not invented." },
-  { label: "Entity-conditioned simulation", text: "A persistent-state simulator that preserves the behavioral signal naive generators lose." },
-  { label: "Fused detector + arms race", text: "Tabular + graph + content signal, stress-tested round over round against adaptive evasion." },
-];
+const PROBLEM_TAGS = ["#GenAI-Fraud", "#Behavioral-Fidelity", "#Adaptive-Adversary"];
+const SOLUTION_TAGS = ["#Entity-Conditioned", "#Fused-Detection", "#Self-Play"];
 
 export default function ProblemSection() {
   return (
@@ -24,48 +21,64 @@ export default function ProblemSection() {
           </h2>
         </div>
 
+        {/* White cards with a small tinted icon badge -- the reference's exact
+            problem/solution treatment, not a full-color panel. */}
         <div className="grid md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-0 items-stretch">
-          <div className="tile-coral rounded-3xl p-7 md:p-9 flex flex-col">
-            <div className="eyebrow mb-4" style={{ color: "#b8541f" }}>
-              The problem we found
+          <div className="card p-7 md:p-9 flex flex-col">
+            <div className="flex items-center gap-3 mb-5">
+              <h3 className="text-xl font-semibold">Problem</h3>
+              <span
+                className="icon-bubble h-8 w-8 shrink-0"
+                style={{ background: "color-mix(in srgb, var(--danger) 14%, white)" }}
+              >
+                <IconWarning color="var(--danger)" />
+              </span>
             </div>
-            <p className="text-base md:text-lg font-medium leading-snug" style={{ color: "#4a2515" }}>
+            <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
               Deepfake voices pass IVR authentication. Autonomous shopping agents run carding attacks at machine
               speed. Synthetic identities build six months of credit history before bust-out — and the synthetic
               data used to train defenses doesn&apos;t even preserve the signal detection depends on.
             </p>
-            <div className="flex flex-wrap gap-x-6 gap-y-4 mt-7 pt-6" style={{ borderTop: "1px solid #ffd2ba" }}>
-              {STATS.map((s) => (
-                <div key={s.label} className="min-w-[130px]">
-                  <div className="data text-xl font-semibold" style={{ color: "#7a3315" }}>{s.value}</div>
-                  <div className="text-xs mt-0.5" style={{ color: "#a8623a" }}>{s.label}</div>
-                </div>
+            <div className="flex flex-wrap gap-2 mt-auto pt-6">
+              {PROBLEM_TAGS.map((t) => (
+                <span key={t} className="pill">{t}</span>
               ))}
             </div>
           </div>
 
           <FlowConnector />
 
-          <div className="tile-teal rounded-3xl p-7 md:p-9 flex flex-col">
-            <div className="eyebrow mb-4" style={{ color: "#0d8f82" }}>
-              The system we built
+          <div className="card p-7 md:p-9 flex flex-col">
+            <div className="flex items-center gap-3 mb-5">
+              <h3 className="text-xl font-semibold">Solution</h3>
+              <span
+                className="icon-bubble h-8 w-8 shrink-0"
+                style={{ background: "color-mix(in srgb, var(--accent) 14%, white)" }}
+              >
+                <IconCheck color="var(--accent)" />
+              </span>
             </div>
-            <p className="text-base md:text-lg font-medium leading-snug mb-6" style={{ color: "#0f3d34" }}>
-              A closed loop, not a slide: the taxonomy, the simulator, and the detector all feed each other — and
-              the whole thing runs live in the console below.
+            <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
+              Ouroboros unifies a grounded attack taxonomy, entity-conditioned simulation, and a fused detector
+              into one closed loop — a self-play arms race and a zero-day discovery agent keep it honest round
+              over round, live in the console below.
             </p>
-            <div className="space-y-4 mt-auto pt-2">
-              {FIXES.map((f) => (
-                <div key={f.label} className="flex gap-3">
-                  <span className="h-1.5 w-1.5 rounded-full shrink-0 mt-2" style={{ background: "#0d8f82" }} />
-                  <div>
-                    <div className="text-sm font-semibold" style={{ color: "#0f3d34" }}>{f.label}</div>
-                    <div className="text-xs mt-0.5" style={{ color: "#3d7268" }}>{f.text}</div>
-                  </div>
-                </div>
+            <div className="flex flex-wrap gap-2 mt-auto pt-6">
+              {SOLUTION_TAGS.map((t) => (
+                <span key={t} className="pill">{t}</span>
               ))}
             </div>
           </div>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px mt-4" style={{ background: "var(--border)" }}>
+          {STATS.map((s) => (
+            <div key={s.label} className="p-5 flex flex-col gap-2" style={{ background: "var(--background)" }}>
+              <span className="data text-2xl md:text-3xl font-semibold">{s.value}</span>
+              <span className="text-sm" style={{ color: "var(--foreground)" }}>{s.label}</span>
+              <span className="text-xs mt-auto" style={{ color: "var(--muted)" }}>{s.sub}</span>
+            </div>
+          ))}
         </div>
       </Reveal>
     </section>
@@ -75,10 +88,33 @@ export default function ProblemSection() {
 function FlowConnector() {
   return (
     <div className="hidden md:flex items-center justify-center px-3">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style={{ color: "var(--muted)" }}>
-        <path d="M4 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+      <span
+        className="icon-bubble h-9 w-9 shrink-0"
+        style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ color: "var(--muted)" }}>
+          <path d="M4 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
     </div>
+  );
+}
+
+function IconWarning({ color }: { color: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3 2 20h20L12 3Z" />
+      <path d="M12 10v4M12 17h.01" />
+    </svg>
+  );
+}
+
+function IconCheck({ color }: { color: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="4" />
+      <path d="m7.5 12.5 3 3 6-6" />
+    </svg>
   );
 }
 

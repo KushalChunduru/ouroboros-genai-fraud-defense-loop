@@ -27,18 +27,27 @@ const CORE = {
 const OTHERS = [
   {
     tab: "Identify",
+    href: "/console",
     title: "Filterable attack taxonomy",
     desc: "15 grounded vectors by channel, rail, social-engineering surface, or technique family — each with a cited 2026 source.",
   },
   {
     tab: "Self-Play Arms Race",
+    href: "/console/self-play",
     title: "Round-over-round arms race",
     desc: "N rounds of escalating attacker evasion against a freshly retrained defender, recall tracked live.",
   },
   {
     tab: "Zero-Day Discovery",
+    href: "/console/zero-day",
     title: "Blind-spot hypothesis generator",
     desc: "Clusters the detector's blind spot and drafts natural-language hypotheses, ready to feed back into the taxonomy.",
+  },
+  {
+    tab: "Summary",
+    href: "/console/summary",
+    title: "One report per run",
+    desc: "Every stage's output synthesized into one shareable permalink — not a disconnected demo per page.",
   },
 ];
 
@@ -48,7 +57,7 @@ export default function FeatureGrid() {
       <Reveal>
         <div className="max-w-2xl mb-10">
           <Eyebrow>In the console</Eyebrow>
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mt-2">Four tabs, each a working screen</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mt-2">Five pages, one connected run</h2>
           <p className="mt-3 text-sm md:text-base" style={{ color: "var(--muted)" }}>
             No mockups — this mirrors the console&apos;s actual navigation. Generate &amp; Detect carries the core
             demo action, so it leads.
@@ -56,7 +65,7 @@ export default function FeatureGrid() {
         </div>
 
         <div style={{ border: "1px solid var(--border)" }}>
-          <Link href="/console" className="block p-5 card-hover" style={{ borderBottom: "1px solid var(--border)" }}>
+          <Link href="/console/generate" className="block p-5 card-hover" style={{ borderBottom: "1px solid var(--border)" }}>
             <span className="eyebrow" style={{ color: "var(--accent)" }}>{CORE.tab}</span>
             <div className="grid sm:grid-cols-3 gap-4 mt-3">
               {CORE.items.map((item) => (
@@ -69,11 +78,11 @@ export default function FeatureGrid() {
             <span className="text-xs mt-3 inline-block" style={{ color: "var(--accent)" }}>Open in console →</span>
           </Link>
 
-          <div className="grid md:grid-cols-3">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4">
             {OTHERS.map((o, i) => (
               <Link
                 key={o.tab}
-                href="/console"
+                href={o.href}
                 className="p-5 flex flex-col gap-2 card-hover"
                 style={{ borderLeft: i > 0 ? "1px solid var(--border)" : undefined }}
               >
