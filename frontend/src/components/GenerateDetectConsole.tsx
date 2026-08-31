@@ -7,13 +7,23 @@ import Counter from "./Counter";
 import ThresholdTuner from "./ThresholdTuner";
 import LiveScoring from "./LiveScoring";
 import FidelityLab from "./FidelityLab";
+import InfoTooltip from "./InfoTooltip";
+
+const METRIC_INFO: Record<string, string> = {
+  Precision: "Of everything flagged as an attack, what fraction actually was one. Low precision means legitimate customers get wrongly declined.",
+  Recall: "Of everything that actually was an attack, what fraction got caught. Low recall means fraud slips through.",
+  F1: "The balance of precision and recall in one number — high only when both are high.",
+  "PR-AUC": "Precision-recall performance averaged across every possible decision threshold, not just the one currently selected — a threshold-independent view of overall detector quality.",
+  "False positive rate": "Of everything that was actually legitimate, what fraction got wrongly flagged. The 2026 industry benchmark targets this under 1%.",
+};
 
 function MetricPill({ label, value, suffix = "", color = "var(--accent)" }: { label: string; value: number; suffix?: string; color?: string }) {
   return (
     <div className="card-2 px-4 py-3 flex-1 min-w-[110px] relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: color }} />
-      <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+      <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>
         {label}
+        {METRIC_INFO[label] && <InfoTooltip title={label}>{METRIC_INFO[label]}</InfoTooltip>}
       </div>
       <div className="text-2xl font-semibold mt-1" style={{ color }}>
         <Counter value={value * 100} suffix={suffix} />
@@ -130,8 +140,13 @@ export default function GenerateDetectConsole({
           </div>
           {gen.narratives_sample.length > 0 && (
             <>
-              <h4 className="text-sm font-medium mb-2" style={{ color: "var(--muted)" }}>
+              <h4 className="text-sm font-medium mb-2 flex items-center gap-2" style={{ color: "var(--muted)" }}>
                 Sample Layer-A narrative artifacts
+                <InfoTooltip title="Layer A">
+                  The qualitative side of each attack — phishing scripts, deepfake transcripts, injection payloads —
+                  written by Gemini when an API key is configured, or a deterministic template otherwise, so this
+                  works fully offline too.
+                </InfoTooltip>
               </h4>
               <div className="grid md:grid-cols-2 gap-2 max-h-64 overflow-y-auto scrollbar-thin pr-1">
                 {gen.narratives_sample.map((n, i) => (
@@ -148,7 +163,14 @@ export default function GenerateDetectConsole({
 
       {gen && (
         <div className="card p-5">
-          <h3 className="font-medium mb-3">Fidelity Lab — prove entity-conditioning matters, on this batch</h3>
+          <h3 className="font-medium mb-3 flex items-center gap-2">
+            Fidelity Lab — prove entity-conditioning matters, on this batch
+            <InfoTooltip title="Why this exists">
+              Row-independent generators (CTGAN, TVAE, GaussianCopula) preserve column averages but destroy the
+              cross-column structure fraud detection depends on. This builds that naive baseline from your own
+              batch and measures the gap, instead of just citing a paper.
+            </InfoTooltip>
+          </h3>
           <FidelityLab batchId={gen.batch_id} />
         </div>
       )}
@@ -193,18 +215,33 @@ export default function GenerateDetectConsole({
             </table>
           </div>
 
-          <h4 className="text-sm font-medium" style={{ color: "var(--muted)" }}>
+          <h4 className="text-sm font-medium flex items-center gap-2" style={{ color: "var(--muted)" }}>
             Tune the decision threshold
+            <InfoTooltip title="Why a slider, not a fixed cutoff">
+              A 0.5 cutoff is arbitrary. Real fraud-ops teams set the threshold to minimize total business cost
+              (missed-fraud cost + false-decline cost) — this recomputes precision/recall/cost live from the scores
+              already returned above, no re-scoring needed.
+            </InfoTooltip>
           </h4>
           <ThresholdTuner scored={det.scored} />
 
-          <h4 className="text-sm font-medium" style={{ color: "var(--muted)" }}>
+          <h4 className="text-sm font-medium flex items-center gap-2" style={{ color: "var(--muted)" }}>
             Entity relationship graph
+            <InfoTooltip title="What you're looking at">
+              Each dot is an entity from this batch; lines connect entities that shared a device. Color = fused risk
+              score (teal = legit, red = high risk). Dense red clusters are fraud rings caught by shared
+              infrastructure — click any node to inspect it.
+            </InfoTooltip>
           </h4>
           <EntityGraph transactions={gen.transactions} scored={det.scored} />
 
-          <h4 className="text-sm font-medium" style={{ color: "var(--muted)" }}>
+          <h4 className="text-sm font-medium flex items-center gap-2" style={{ color: "var(--muted)" }}>
             Top flagged transactions (grounded, attribution-based explanations)
+            <InfoTooltip title="What does grounded mean here?">
+              The explanation text is generated from this transaction&apos;s actual signal breakdown (tabular, graph,
+              content scores) — the model is constrained to summarize numbers it was given, not invent a plausible-
+              sounding reason.
+            </InfoTooltip>
           </h4>
           <div className="space-y-2 max-h-96 overflow-y-auto scrollbar-thin pr-1">
             {det.scored
@@ -233,7 +270,14 @@ export default function GenerateDetectConsole({
       )}
 
       <div className="card p-5">
-        <h3 className="font-medium mb-3">Prove real-time feasibility</h3>
+        <h3 className="font-medium mb-3 flex items-center gap-2">
+          Prove real-time feasibility
+          <InfoTooltip title="Batch vs. real-time">
+            Everything above scores a whole batch at once. This scores exactly one transaction through the same
+            trained detector and times it server-side — proving the model is fast enough for a live authorization
+            path (industry target: under 100ms), not just accurate offline.
+          </InfoTooltip>
+        </h3>
         <LiveScoring vectors={vectors} detectorReady={!!det} />
       </div>
     </div>

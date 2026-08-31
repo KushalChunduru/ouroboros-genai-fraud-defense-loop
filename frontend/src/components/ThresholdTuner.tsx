@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ScoredTransaction } from "@/lib/api";
+import InfoTooltip from "./InfoTooltip";
 
 /**
  * Decision threshold is a business-cost choice, not a fixed 0.5 -- 2026
@@ -100,11 +101,11 @@ export default function ThresholdTuner({ scored }: { scored: ScoredTransaction[]
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-px" style={{ background: "var(--border)" }}>
-        <Cell label="Precision" value={`${(current.precision * 100).toFixed(1)}%`} />
-        <Cell label="Recall" value={`${(current.recall * 100).toFixed(1)}%`} color="var(--legit)" />
-        <Cell label="F1" value={`${(current.f1 * 100).toFixed(1)}%`} />
-        <Cell label="FPR" value={`${(current.fpr * 100).toFixed(1)}%`} color={current.fpr > 0.01 ? "var(--warn)" : "var(--legit)"} />
-        <Cell label="Est. cost" value={`$${current.cost.toLocaleString()}`} color="var(--danger)" />
+        <Cell label="Precision" value={`${(current.precision * 100).toFixed(1)}%`} info="Of transactions flagged at this threshold, the fraction that were really fraud." />
+        <Cell label="Recall" value={`${(current.recall * 100).toFixed(1)}%`} color="var(--legit)" info="Of all real fraud in this batch, the fraction caught at this threshold." />
+        <Cell label="F1" value={`${(current.f1 * 100).toFixed(1)}%`} info="Precision and recall combined into one number — only high when both are." />
+        <Cell label="FPR" value={`${(current.fpr * 100).toFixed(1)}%`} color={current.fpr > 0.01 ? "var(--warn)" : "var(--legit)"} info="Of all legitimate transactions, the fraction wrongly declined at this threshold. 2026 industry target: under 1%." />
+        <Cell label="Est. cost" value={`$${current.cost.toLocaleString()}`} color="var(--danger)" info="(missed fraud × your cost-per-miss) + (false declines × your cost-per-decline) at this exact threshold — recomputed live as you move the slider." />
       </div>
       <p className="text-[11px]" style={{ color: "var(--muted)" }}>
         2026 industry benchmark targets high recall with FPR under 1%. At the current threshold: {current.tp} caught,{" "}
@@ -114,11 +115,14 @@ export default function ThresholdTuner({ scored }: { scored: ScoredTransaction[]
   );
 }
 
-function Cell({ label, value, color }: { label: string; value: string; color?: string }) {
+function Cell({ label, value, color, info }: { label: string; value: string; color?: string; info?: string }) {
   return (
     <div className="p-3" style={{ background: "var(--background)" }}>
       <div className="data text-lg font-semibold" style={{ color: color ?? "var(--foreground)" }}>{value}</div>
-      <div className="text-[10px] mt-0.5" style={{ color: "var(--muted)" }}>{label}</div>
+      <div className="flex items-center gap-1.5 text-[10px] mt-0.5" style={{ color: "var(--muted)" }}>
+        {label}
+        {info && <InfoTooltip title={label}>{info}</InfoTooltip>}
+      </div>
     </div>
   );
 }

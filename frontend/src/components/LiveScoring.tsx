@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api, AttackVector, LiveScoreResponse, Transaction } from "@/lib/api";
+import InfoTooltip from "./InfoTooltip";
 
 /**
  * Proves the feasibility claim with a real number instead of an assertion:
@@ -118,13 +119,22 @@ export default function LiveScoring({ vectors, detectorReady }: { vectors: Attac
             </span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px" style={{ background: "var(--border)" }}>
-            <Cell label="Fused score" value={result.fused_score.toFixed(3)} />
-            <Cell label="Tabular signal" value={result.gbm_score.toFixed(3)} />
-            <Cell label="Graph signal" value={result.graph_score.toFixed(3)} />
             <Cell
-              label="Inference latency"
-              value={`${result.latency_ms.toFixed(2)} ms`}
+              label="Fused score" value={result.fused_score.toFixed(3)}
+              info="The final 0-1 risk score: a weighted blend of the three signals to the right. Flagged as attack at ≥0.5 here (the tuner above lets you change that cutoff for a whole batch)."
+            />
+            <Cell
+              label="Tabular signal" value={result.gbm_score.toFixed(3)}
+              info="Score from the gradient-boosted classifier trained on this transaction's amount, velocity, timing, and session features alone — no graph or text context."
+            />
+            <Cell
+              label="Graph signal" value={result.graph_score.toFixed(3)}
+              info="Risk propagated from shared infrastructure (device/IP/merchant) this entity is connected to in the training graph — high even if this single transaction looks ordinary, when its device is linked to known-risky entities."
+            />
+            <Cell
+              label="Inference latency" value={`${result.latency_ms.toFixed(2)} ms`}
               color={result.latency_ms < 100 ? "var(--legit)" : "var(--warn)"}
+              info="Measured server-side with time.perf_counter() around the actual model inference call — not estimated. Industry target for a live authorization-path check is under 100ms."
             />
           </div>
           <p className="text-[11px] mt-2" style={{ color: "var(--muted)" }}>
@@ -140,11 +150,14 @@ export default function LiveScoring({ vectors, detectorReady }: { vectors: Attac
   );
 }
 
-function Cell({ label, value, color }: { label: string; value: string; color?: string }) {
+function Cell({ label, value, color, info }: { label: string; value: string; color?: string; info?: string }) {
   return (
     <div className="p-3" style={{ background: "var(--background)" }}>
       <div className="data text-lg font-semibold" style={{ color: color ?? "var(--foreground)" }}>{value}</div>
-      <div className="text-[10px] mt-0.5" style={{ color: "var(--muted)" }}>{label}</div>
+      <div className="flex items-center gap-1.5 text-[10px] mt-0.5" style={{ color: "var(--muted)" }}>
+        {label}
+        {info && <InfoTooltip title={label}>{info}</InfoTooltip>}
+      </div>
     </div>
   );
 }

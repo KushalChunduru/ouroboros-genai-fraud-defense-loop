@@ -43,7 +43,7 @@ export default function InfoTooltip({
         aria-label={title ? `More info: ${title}` : "More info"}
         aria-expanded={open}
         className="badge-outline h-4 w-4 text-[9px] shrink-0 leading-none"
-        style={{ cursor: "pointer" }}
+        style={{ cursor: "pointer", textTransform: "none" }}
       >
         i
       </button>
@@ -56,6 +56,9 @@ export default function InfoTooltip({
             [align]: 0,
             width: 240,
             boxShadow: "0 12px 28px -8px rgba(0,0,0,0.55)",
+            textTransform: "none",
+            letterSpacing: "normal",
+            fontWeight: 400,
           }}
         >
           {title && <div className="font-medium mb-1" style={{ color: "var(--accent)" }}>{title}</div>}

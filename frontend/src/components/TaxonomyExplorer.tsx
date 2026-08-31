@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { api, AttackVector } from "@/lib/api";
+import InfoTooltip from "./InfoTooltip";
 
 const AXES = ["channel", "rail", "social_surface", "technique"] as const;
 
@@ -38,7 +39,14 @@ export default function TaxonomyExplorer({
         <p className="text-sm" style={{ color: "var(--muted)" }}>
           {vectors.length} grounded GenAI payment-fraud attack vectors, tagged across four independent axes
           (channel, rail, social-engineering surface, technique family) so coverage is provably broad rather than a
-          flat anecdotal list. New entries can be appended automatically by the Zero-Day Discovery agent.
+          flat anecdotal list. New entries can be appended automatically by the Zero-Day Discovery agent. Each card
+          below shows a &ldquo;sev&rdquo; score{" "}
+          <InfoTooltip title="Severity score">
+            A 0-1 estimate of real-world impact per vector, set from the grounding source cited on each card (e.g.
+            reported financial loss, attack scale, how established the technique is) — used as the base risk weight
+            when the simulator seeds that attack type, not a detector output.
+          </InfoTooltip>
+          {" "}— click any card to select it for simulation.
         </p>
         <div className="flex flex-wrap gap-2 mt-4">
           {AXES.map((a) => (
