@@ -1,6 +1,8 @@
+<div align="center">
+
 # Ouroboros
 
-**The attack and the defense, trained in the same loop.**
+### The attack and the defense, trained in the same loop.
 
 [![Mastercard Innovation Challenge](https://img.shields.io/badge/Mastercard%20Innovation%20Challenge-GFF%202026-black?style=flat-square)](https://github.com/KushalChunduru/ouroboros-genai-fraud-defense-loop)
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org)
@@ -9,40 +11,23 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Synthetic data only](https://img.shields.io/badge/data-100%25%20synthetic-16a34a?style=flat-square)](#data--privacy)
 
-A closed-loop AI system for GenAI-era payment fraud. It **identifies** emerging attack vectors grounded in named 2026 threat reporting, **generates** high-fidelity behavioral simulations of them at scale, and **defends** with a fused detector — then runs the whole system as a self-play arms race and a zero-day discovery agent, so the defender's own blind spots become tomorrow's attack hypotheses.
+**[Architecture](#the-loop)** · **[Quick start](#getting-started)** · **[API](#api-surface)** · **[References](#grounding--references)**
 
-Live console: five connected pages (`/console` → `/console/generate` → `/console/self-play` → `/console/zero-day` → `/console/summary`), one shared run, real backend calls throughout — no mocked data anywhere in the demo path.
+</div>
 
-See [`docs/DESIGN.md`](docs/DESIGN.md) for the UI/UX research and decision log behind the frontend, and [`docs/Ouroboros_Solution_Walkthrough.docx`](docs/Ouroboros_Solution_Walkthrough.docx) for the full written solution walkthrough.
+<br>
 
----
+> An ouroboros is a serpent eating its own tail — an ancient symbol for something that sustains itself in a closed cycle. This system is that mechanism made literal: **the defender's own blind spots become the attacker's next move, on purpose, every round.**
 
-## Table of contents
+Most fraud-simulation projects generate a dataset once, train a classifier once, and report a score once — a straight line from A to B. Ouroboros is a closed loop instead. It **identifies** emerging GenAI attack vectors grounded in named 2026 threat reporting, **generates** high-fidelity behavioral simulations of them, and **defends** with a fused detector — then feeds the detector's own performance back into a self-play arms race and a zero-day discovery agent, so the system's output becomes its next input.
 
-- [Why this isn't a one-shot pipeline](#why-this-isnt-a-one-shot-pipeline)
-- [The loop](#the-loop)
-- [Feasibility, made concrete not asserted](#feasibility-made-concrete-not-asserted)
-- [Architecture](#architecture)
-- [Tech stack](#tech-stack)
-- [API surface](#api-surface)
-- [Getting started](#getting-started)
-- [Project structure](#project-structure)
-- [Grounding & references](#grounding--references)
-- [Data & privacy](#data--privacy)
-- [Real-world feasibility](#real-world-feasibility)
+Five connected console pages, one shared run, real backend calls throughout — no mocked data anywhere in the demo path:
+
+`/console` → `/console/generate` → `/console/self-play` → `/console/zero-day` → `/console/summary`
+
+See [`docs/DESIGN.md`](docs/DESIGN.md) for the UI/UX research and decision log, and [`docs/Ouroboros_Solution_Walkthrough.docx`](docs/Ouroboros_Solution_Walkthrough.docx) for the full written walkthrough.
 
 ---
-
-## Why this isn't a one-shot pipeline
-
-Most fraud-simulation projects generate a dataset once, train a classifier once, and report a score once. Ouroboros instead closes the loop:
-
-1. **Identifies** 15 GenAI fraud vectors across 4 independent axes (channel, rail, social-engineering surface, technique family), each grounded in a named, hyperlinked 2026 source — Visa PERC, Experian, TransUnion, FS-ISAC, HUMAN Security, Signifyd/Darwinium, Security Boulevard, and peer-reviewed arXiv papers (see [`backend/app/taxonomy.json`](backend/app/taxonomy.json)).
-2. **Generates** with an *entity-conditioned behavioral simulator* — not a row-independent GAN/tabular generator. A 2026 benchmark ([arXiv:2604.13125](https://arxiv.org/abs/2604.13125)) showed row-independent generators (CTGAN, TVAE, GaussianCopula, TabularARGN) are 17–100× worse than real data at preserving temporal burst timing, device/IP graph fan-out, and velocity-rule calibration — because they generate each row independently. Ouroboros's simulator gives every entity persistent state and conditions each transaction on that entity's running history, then proves the claim live with a self-validating **Fidelity Lab** that benchmarks itself against a naive-shuffle baseline on the exact batch you generated.
-3. **Defends** with a fused detector: gradient boosting (tabular behavior) + graph-propagation risk (shared device/IP/merchant infrastructure) + a content-language score, with grounded, attribution-based explanations for every flagged transaction.
-4. **Closes the loop twice**:
-   - A **self-play arms race** runs *N* rounds where the attacker escalates evasion specifically on the vectors the defender caught best last round, and a fresh detector is trained and evaluated each round — the round-over-round recall curve is the demoable evidence of a real closed loop, not an asserted property.
-   - A **zero-day discovery agent** runs unsupervised anomaly detection restricted to the defender's current blind spot, clusters the anomalies, and asks an LLM to draft a natural-language attack hypothesis per cluster — growing the taxonomy automatically instead of leaving it a static document.
 
 ## The loop
 
@@ -90,16 +75,58 @@ flowchart LR
     style ZERODAY fill:#b3690a,color:#fff,stroke:none
 ```
 
-The two feedback edges — self-play back into the detector, and zero-day discovery back into the taxonomy — are what make this a loop instead of a pipeline. Both run live in the console and are the actual mechanism the "Ouroboros" name refers to: the system's own output becomes its next input.
+The two feedback edges — self-play back into the detector, zero-day discovery back into the taxonomy — are the whole thesis. Everything else in this repo exists to make those two arrows real and measurable instead of a slide.
+
+### One self-play round, end to end
+
+```mermaid
+sequenceDiagram
+    participant A as Attacker (simulator)
+    participant D as Fused detector
+    participant S as Scoreboard
+
+    A->>D: Generate batch at evasion level N
+    D->>D: Train fresh on held-out split
+    D->>S: Score batch, report recall
+    S->>A: "Here's what you missed"
+    A->>A: Escalate evasion, targeting what got caught
+    Note over A,S: Repeat for N rounds — recall curve is the live evidence
+```
+
+## 60-second tour
+
+| Step | Page | What actually happens |
+|---|---|---|
+| 1 | **Identify** — `/console` | Pick from 15 hyperlinked, sourced attack vectors, or select all |
+| 2 | **Generate & Detect** — `/console/generate` | Simulate an entity-conditioned batch, prove fidelity vs. a naive-shuffle baseline, then train + evaluate the fused detector |
+| 3 | **Self-Play** — `/console/self-play` | Watch the attacker escalate evasion round over round against a freshly retrained detector |
+| 4 | **Zero-Day** — `/console/zero-day` | Mine the detector's blind spot, get LLM-drafted attack hypotheses back |
+| 5 | **Summary** — `/console/summary` | One synthesized report on this exact run, with a shareable permalink |
+
+## Why entity-conditioning isn't a nice-to-have
+
+Row-independent generators are the industry default — and they quietly destroy the exact signal fraud detection depends on. A 2026 benchmark ([arXiv:2604.13125](https://arxiv.org/abs/2604.13125)) measured it directly:
+
+| | Row-independent generators (CTGAN, TVAE, GaussianCopula, TabularARGN) | Ouroboros's entity-conditioned simulator |
+|---|---|---|
+| Entity state | None — every row sampled independently | Persistent per entity (devices, IP, spend, session history) |
+| Burst timing | Not preserved | Conditioned on the entity's running history |
+| Device/IP fan-out | Not preserved | Modeled as real graph motifs |
+| Behavioral fidelity vs. real data | **17–100× worse** (measured) | Benchmarked live, per batch, against a naive-shuffle baseline you can inspect |
+
+That last row isn't a citation borrowed from the paper — it's the **Fidelity Lab**, a self-validating check built into the console that runs the same comparison on whatever batch you just generated, live.
 
 ## Feasibility, made concrete not asserted
 
 - **Cost-based threshold tuning** — 2026 fraud-ops practice sets the decision threshold to minimize total business cost (missed-fraud cost + false-decline cost), not a fixed 0.5 cutoff. Enter your own cost assumptions in the console and the cost-minimizing threshold is computed live from scores already returned by `/api/detect` — no re-scoring required.
 - **Real single-transaction scoring with measured latency** — batch scoring proves accuracy; live scoring proves the fused detector is fast enough to sit inline in a real authorization path. The industry target is sub-100ms; sample transactions typically score in 10–30ms end-to-end, measured server-side with `time.perf_counter()`, not estimated.
-- **One connected run across five pages, not five disconnected demos** — `/console` → `/console/generate` → `/console/self-play` → `/console/zero-day` → `/console/summary` are real, bookmarkable routes that all read from the same run (persisted across page loads), each ending with an explicit link to what comes next.
+- **One connected run across five pages, not five disconnected demos** — each stage page reads from the same run (persisted across page loads and refreshes) and ends with an explicit link to what comes next.
 - **Every research claim is a real, verified hyperlink** — the taxonomy's 15 source citations and the four headline threat statistics link directly to the actual report or paper, not just a name in italics.
 
 ## Architecture
+
+<details>
+<summary><strong>Expand full directory layout</strong></summary>
 
 ```
 backend/                  FastAPI + scikit-learn + networkx + Gemini (optional)
@@ -124,6 +151,8 @@ frontend/                 Next.js 16 (App Router) + TypeScript + Tailwind v4
                               ZeroDayPanel, RunSummary, FidelityLab, ThresholdTuner, LiveScoring
 ```
 
+</details>
+
 ## Tech stack
 
 | Layer | Technology |
@@ -140,6 +169,9 @@ frontend/                 Next.js 16 (App Router) + TypeScript + Tailwind v4
 
 ## API surface
 
+<details>
+<summary><strong>Expand endpoint table</strong></summary>
+
 | Method | Endpoint | Purpose |
 |---|---|---|
 | `GET` | `/api/health` | Backend status, vector count, Gemini enabled flag |
@@ -153,6 +185,8 @@ frontend/                 Next.js 16 (App Router) + TypeScript + Tailwind v4
 | `GET` | `/api/sample_transaction` | Sample one legit or attack transaction |
 | `POST` | `/api/score_live` | Score one transaction with measured latency |
 | `POST` | `/api/narrative_preview` | Preview a generated narrative for one vector |
+
+</details>
 
 ## Getting started
 
@@ -188,16 +222,6 @@ npm install
 npm run build
 ```
 
-## Project structure
-
-```
-Mastercard/
-├── backend/            FastAPI app, ML pipeline, taxonomy data
-├── frontend/            Next.js console + landing page
-├── docs/                 Design log, solution walkthrough generator
-└── README.md
-```
-
 ## Grounding & references
 
 Every taxonomy vector and every headline statistic in the app links to its real, verified source — no fabricated citations. A sample of what's grounding the core claims:
@@ -222,4 +246,8 @@ Every transaction, entity, device, and narrative is synthetic and generated at r
 
 ---
 
-Built for the **Mastercard Innovation Challenge @ GFF 2026**.
+<div align="center">
+
+*The tail feeds the head. The loop closes. Built for the **Mastercard Innovation Challenge @ GFF 2026**.*
+
+</div>
