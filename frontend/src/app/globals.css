@@ -50,7 +50,7 @@ body {
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 20px;
   box-shadow: var(--shadow-sm);
   transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
@@ -58,7 +58,7 @@ body {
 .card-2 {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 16px;
   transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
 
@@ -103,6 +103,9 @@ body {
 .segment[data-active="true"] {
   background: var(--accent);
   color: white;
+}
+.nav-link:hover {
+  color: var(--foreground);
 }
 .segment:focus-visible,
 .btn:focus-visible,
@@ -179,14 +182,6 @@ button:focus-visible {
   mask-image: linear-gradient(to bottom, black, transparent);
 }
 
-/* Hero wash: two large, very-low-opacity color fields (not a glow blob) --
-   reads as a considered brand surface, confined to one section. */
-.hero-wash {
-  background:
-    radial-gradient(720px 420px at 8% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 65%),
-    radial-gradient(640px 380px at 92% 15%, color-mix(in srgb, var(--legit) 9%, transparent), transparent 60%);
-}
-
 /* Single-word emphasis in headlines -- used sparingly (one word, not whole
    headings) so it reads as intentional brand accent, not template gradient. */
 .text-gradient {
@@ -213,6 +208,42 @@ button:focus-visible {
 }
 .mesh-spotlight .mesh-muted {
   color: rgba(244, 245, 255, 0.72);
+}
+
+/* Light mesh: the hero band -- a saturated color pool bleeding to white,
+   dark text on top. Full-bleed, sits behind the nav so the hero reads as
+   one continuous surface instead of a bar-plus-content stack. */
+.mesh-hero {
+  background-color: #fbfdfd;
+  background-image:
+    radial-gradient(85% 130% at 8% -10%, color-mix(in srgb, #17d9a3 42%, transparent), transparent 62%),
+    radial-gradient(70% 110% at 100% -20%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 58%);
+}
+
+/* Problem/solution duet: two mesh panels in one warm-to-cool pairing,
+   lifted straight from the reference's "problem we found / system we
+   built" flow -- the diagnosis and the fix get equal visual weight. */
+.mesh-warm {
+  position: relative;
+  overflow: hidden;
+  background-color: #1a0e0a;
+  background-image:
+    radial-gradient(120% 150% at 15% 10%, color-mix(in srgb, #ff7a4d 75%, transparent), transparent 58%),
+    radial-gradient(110% 140% at 100% 100%, color-mix(in srgb, var(--danger) 55%, transparent), transparent 60%);
+  color: #fff4ef;
+}
+.mesh-cool {
+  position: relative;
+  overflow: hidden;
+  background-color: #0a1020;
+  background-image:
+    radial-gradient(120% 150% at 85% 10%, color-mix(in srgb, var(--accent-2) 70%, transparent), transparent 58%),
+    radial-gradient(110% 140% at 0% 100%, color-mix(in srgb, var(--accent) 65%, transparent), transparent 60%);
+  color: #eef2ff;
+}
+.mesh-warm .mesh-muted,
+.mesh-cool .mesh-muted {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* Outlined numbered badge -- a ring, not a filled disc. Lighter, more

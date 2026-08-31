@@ -15,9 +15,8 @@ export default function Hero() {
 
   return (
     <section className="relative overflow-hidden">
-      <div className="hero-wash absolute inset-0 h-[520px]" aria-hidden="true" />
       <div className="dot-grid absolute inset-0 h-[420px]" aria-hidden="true" />
-      <div className="relative max-w-6xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-20">
+      <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-20 md:pt-24 md:pb-28">
       <motion.div
         className="max-w-3xl"
         initial={reduce ? undefined : { opacity: 0, y: 10 }}

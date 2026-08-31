@@ -10,8 +10,10 @@ import FinalCTA from "@/components/landing/FinalCTA";
 export default function LandingPage() {
   return (
     <div className="flex-1 flex flex-col">
-      <Nav />
-      <Hero />
+      <div className="mesh-hero">
+        <Nav />
+        <Hero />
+      </div>
       <ProblemSection />
       <PillarsSection />
       <LoopSection />

@@ -12,7 +12,7 @@ const LINKS = [
 
 export default function Nav() {
   return (
-    <div className="border-b" style={{ borderColor: "var(--border)" }}>
+    <div className="relative">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
         <Link href="/" className="flex items-center gap-2.5">
           <OuroborosMark size={18} />
@@ -21,7 +21,7 @@ export default function Nav() {
 
         <nav className="hidden md:flex items-center gap-7 text-sm" style={{ color: "var(--muted)" }}>
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="hover:text-white transition-colors">
+            <a key={l.href} href={l.href} className="nav-link transition-colors" style={{ color: "var(--muted)" }}>
               {l.label}
             </a>
           ))}
