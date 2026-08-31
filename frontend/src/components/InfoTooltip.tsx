@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 /**
  * Click-to-open info popover, not hover-only -- works on touch devices, and
@@ -14,7 +14,9 @@ export default function InfoTooltip({
   title?: string; children: ReactNode; align?: "left" | "right";
 }) {
   const [open, setOpen] = useState(false);
+  const [shift, setShift] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
+  const panelRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -30,6 +32,21 @@ export default function InfoTooltip({
       document.removeEventListener("mousedown", onClick);
       document.removeEventListener("keydown", onKey);
     };
+  }, [open]);
+
+  // Clamp back into the viewport -- fixed left/right offsets aren't enough
+  // since this trigger sits inline in wrapping paragraph text and can land
+  // anywhere from the left edge to the right edge of the screen.
+  useLayoutEffect(() => {
+    if (!open) return;
+    const el = panelRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const overflowRight = rect.right - (window.innerWidth - 8);
+    const overflowLeft = 8 - rect.left;
+    if (overflowRight > 0) setShift(-overflowRight);
+    else if (overflowLeft > 0) setShift(overflowLeft);
+    else setShift(0);
   }, [open]);
 
   return (
@@ -49,6 +66,7 @@ export default function InfoTooltip({
       </button>
       {open && (
         <span
+          ref={panelRef}
           role="tooltip"
           className="card-2 absolute z-30 p-3 text-xs"
           style={{
@@ -56,6 +74,7 @@ export default function InfoTooltip({
             top: "calc(100% + 6px)",
             [align]: 0,
             width: 240,
+            transform: shift ? `translateX(${shift}px)` : undefined,
             boxShadow: "var(--shadow-lg)",
             textTransform: "none",
             letterSpacing: "normal",
