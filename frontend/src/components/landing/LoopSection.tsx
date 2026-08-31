@@ -23,8 +23,10 @@ export default function LoopSection() {
 
         <div className="grid md:grid-cols-2">
           <div className="p-6 md:pr-8" style={{ borderTop: "1px solid var(--border)" }}>
-            <div className="flex items-center gap-2 mb-3">
-              <IconLoop color="var(--legit)" />
+            <div className="flex items-center gap-2.5 mb-3">
+              <span className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0" style={{ border: "1.5px solid var(--border-strong)" }}>
+                <IconLoop color="var(--legit)" />
+              </span>
               <div className="text-xs font-semibold tracking-wide" style={{ color: "var(--legit)" }}>
                 LOOP 1 — SELF-PLAY ARMS RACE
               </div>
@@ -36,8 +38,10 @@ export default function LoopSection() {
             </p>
           </div>
           <div className="p-6 md:pl-8" style={{ borderTop: "1px solid var(--border)", borderLeft: "1px solid var(--border)" }}>
-            <div className="flex items-center gap-2 mb-3">
-              <IconMicroscope color="var(--warn)" />
+            <div className="flex items-center gap-2.5 mb-3">
+              <span className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0" style={{ border: "1.5px solid var(--border-strong)" }}>
+                <IconMicroscope color="var(--warn)" />
+              </span>
               <div className="text-xs font-semibold tracking-wide" style={{ color: "var(--warn)" }}>
                 LOOP 2 — ZERO-DAY DISCOVERY
               </div>

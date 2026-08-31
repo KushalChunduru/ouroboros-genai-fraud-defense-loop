@@ -49,8 +49,13 @@ export default function PillarsSection() {
               style={{ borderTop: "1px solid var(--border)", borderLeft: i > 0 ? "1px solid var(--border)" : undefined }}
             >
               <div className="flex items-center gap-3 mb-4">
+                <span
+                  className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ border: "1.5px solid var(--border-strong)" }}
+                >
+                  <p.Icon color="var(--accent)" />
+                </span>
                 <span className="data text-xs" style={{ color: "var(--muted)" }}>{p.n}</span>
-                <p.Icon color="var(--accent)" />
               </div>
               <h3 className="text-lg font-semibold">{p.title}</h3>
               <div className="text-xs mb-3 font-medium" style={{ color: "var(--accent)" }}>

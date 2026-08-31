@@ -154,6 +154,36 @@ button:focus-visible {
   }
 }
 
+/* Fintech-signature texture: a faint technical dot grid, not a gradient
+   blob -- reads as engineered/precise rather than decorative. Confined to
+   specific sections, never full-page. */
+.dot-grid {
+  background-image: radial-gradient(var(--border-strong) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+  mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+/* Outlined numbered badge -- a ring, not a filled disc. Lighter, more
+   drafting-table than template-hero. */
+.badge-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-strong);
+  color: var(--muted);
+  font-weight: 600;
+}
+.badge-outline[data-state="done"] {
+  border-color: var(--legit);
+  color: var(--legit);
+}
+.badge-outline[data-state="current"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .scrollbar-thin::-webkit-scrollbar {
   width: 8px;
   height: 8px;

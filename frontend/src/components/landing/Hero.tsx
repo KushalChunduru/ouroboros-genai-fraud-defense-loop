@@ -14,7 +14,9 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="max-w-6xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-20">
+    <section className="relative overflow-hidden">
+      <div className="dot-grid absolute inset-0 h-[420px]" aria-hidden="true" />
+      <div className="relative max-w-6xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-20">
       <motion.div
         className="max-w-3xl"
         initial={reduce ? undefined : { opacity: 0, y: 10 }}
@@ -49,6 +51,7 @@ export default function Hero() {
         <Stat value="3" label="pillars, one closed loop" />
         <Stat value="2" label="self-improving feedback loops" />
         <Stat value="0" label="real PII — fully synthetic" />
+      </div>
       </div>
     </section>
   );

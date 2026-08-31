@@ -11,12 +11,38 @@ import uuid
 from collections import Counter
 
 import numpy as np
-from sklearn.cluster import KMeans
 from sklearn.ensemble import IsolationForest
 
 from app.defend.detector import FusedDetector
 from app.defend.features import build_feature_matrix
 from app.generate.narrative_agent import generate_zero_day_hypothesis
+
+
+def _simple_kmeans(X: np.ndarray, k: int, iterations: int = 25, seed: int = 42) -> np.ndarray:
+    """Minimal from-scratch k-means (Lloyd's algorithm). Used instead of
+    sklearn.cluster.KMeans so this module has no dependency on
+    sklearn.cluster, whose compiled extensions have been observed to be
+    blocked by Windows Smart App Control on some machines even when
+    sklearn.ensemble (used elsewhere in this codebase) is unaffected --
+    the clustering step here is small and simple enough not to need a
+    full library implementation."""
+    rng = np.random.RandomState(seed)
+    n = X.shape[0]
+    if k >= n:
+        return np.arange(n)
+    centers = X[rng.choice(n, k, replace=False)].copy()
+    labels = np.zeros(n, dtype=int)
+    for _ in range(iterations):
+        dists = ((X[:, None, :] - centers[None, :, :]) ** 2).sum(axis=2)
+        new_labels = dists.argmin(axis=1)
+        if np.array_equal(new_labels, labels) and _ > 0:
+            break
+        labels = new_labels
+        for c in range(k):
+            mask = labels == c
+            if mask.any():
+                centers[c] = X[mask].mean(axis=0)
+    return labels
 
 
 def discover_zero_day_patterns(transactions: list[dict], detector: FusedDetector,
@@ -40,7 +66,7 @@ def discover_zero_day_patterns(transactions: list[dict], detector: FusedDetector
     X_anom = build_feature_matrix(anomalous_txns)
 
     k = min(max_clusters, max(1, len(anomalous_txns) // 4))
-    labels = KMeans(n_clusters=k, n_init=4, random_state=42).fit_predict(X_anom) if k > 1 else np.zeros(len(anomalous_txns), dtype=int)
+    labels = _simple_kmeans(X_anom, k) if k > 1 else np.zeros(len(anomalous_txns), dtype=int)
 
     hypotheses = []
     for cluster_id in sorted(set(labels.tolist())):

@@ -32,14 +32,7 @@ export default function StageRail({ stages }: { stages: Stage[] }) {
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm shrink-0 whitespace-nowrap transition-colors"
               style={{ color: s.status === "pending" ? "var(--muted)" : "var(--foreground)" }}
             >
-              <span
-                className="data h-4 w-4 rounded-full flex items-center justify-center text-[9px] shrink-0"
-                style={{
-                  background: s.status === "done" ? "var(--legit)" : s.status === "current" ? "var(--accent)" : "var(--surface-2)",
-                  color: s.status === "pending" ? "var(--muted)" : s.status === "done" ? "#04231c" : "white",
-                  border: s.status === "pending" ? "1px solid var(--border)" : undefined,
-                }}
-              >
+              <span className="data badge-outline h-4 w-4 text-[9px] shrink-0" data-state={s.status}>
                 {s.status === "done" ? "✓" : i + 1}
               </span>
               {s.label}
