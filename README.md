@@ -11,7 +11,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Synthetic data only](https://img.shields.io/badge/data-100%25%20synthetic-16a34a?style=flat-square)](#data--privacy)
 
-**[Architecture](#the-loop)** · **[Quick start](#getting-started)** · **[API](#api-surface)** · **[References](#grounding--references)**
+**[Evaluation criteria](#how-this-maps-to-the-evaluation-criteria)** · **[Architecture](#the-loop)** · **[Quick start](#getting-started)** · **[API](#api-surface)** · **[References](#grounding--references)**
 
 </div>
 
@@ -26,6 +26,18 @@ Five connected console pages, one shared run, real backend calls throughout — 
 `/console` → `/console/generate` → `/console/self-play` → `/console/zero-day` → `/console/summary`
 
 See [`docs/DESIGN.md`](docs/DESIGN.md) for the UI/UX research and decision log, and [`docs/Ouroboros_Solution_Walkthrough.docx`](docs/Ouroboros_Solution_Walkthrough.docx) for the full written walkthrough.
+
+---
+
+## How this maps to the evaluation criteria
+
+| Criterion | Where it's answered |
+|---|---|
+| **Diversity of attacks identified** | 15 vectors spanning 4 *independent* axes — channel, rail, social-engineering surface, technique family (not a flat list) — so coverage is provably broad rather than anecdotal. Every vector is grounded in a named, hyperlinked 2026 source. See [`backend/app/taxonomy.json`](backend/app/taxonomy.json) and the [Identify page](#60-second-tour). |
+| **Fidelity of attacks in simulation** | Entity-conditioned simulator (persistent per-entity state, not row-independent), benchmarked *live* against a naive-shuffle baseline by the self-validating **Fidelity Lab** on whatever batch you just generated — not just a citation, a real measurement you can inspect. See [Why entity-conditioning isn't a nice-to-have](#why-entity-conditioning-isnt-a-nice-to-have). |
+| **Detection algorithms and their efficacy** | A *fused* detector — gradient-boosted tabular signal + graph-propagation risk + content-language signal — with real precision/recall/F1/PR-AUC/FPR reported per vector on a held-out split, cost-based threshold tuning (not a fixed 0.5 cutoff), and grounded explanations per flagged transaction. See [`app/defend/`](backend/app/defend/) and the [Generate & Detect page](#60-second-tour). |
+| **Novelty of the solution** | The two closed feedback loops are *implemented and measured live*, not asserted: a **self-play arms race** where the attacker escalates specifically against what the detector caught last round, and a **zero-day discovery agent** that mines the detector's own blind spot and proposes new attack hypotheses back into the taxonomy. The system's output becomes its next input — see [The loop](#the-loop). |
+| **Real-world feasibility in live payments** | Sub-100ms single-transaction scoring with *measured* server-side latency (not estimated), a cost-based threshold matching 2026 fraud-ops practice, a feature pipeline designed to point at real production transaction logs unmodified, and attack vectors (`agentic_checkout_hijack`, `agent_credential_exfil`) targeting the emerging agentic-commerce surface that has almost no public tooling yet. See [Real-world feasibility](#real-world-feasibility). |
 
 ---
 
