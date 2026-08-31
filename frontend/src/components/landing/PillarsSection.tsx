@@ -9,6 +9,7 @@ const PILLARS = [
     tag: "Living taxonomy",
     desc: "15 GenAI payment-fraud attack vectors tagged across four independent axes — channel, rail, social-engineering surface, technique — each grounded in a named 2026 source, not invented from first principles.",
     Icon: IconRadar,
+    color: "var(--accent)",
   },
   {
     n: "02",
@@ -16,6 +17,7 @@ const PILLARS = [
     tag: "Entity-conditioned simulation",
     desc: "A persistent-state behavioral simulator (not a row-independent GAN) plus a Gemini narrative agent, producing transaction graphs and attack content that preserve burst timing and device-sharing motifs.",
     Icon: IconSpark,
+    color: "var(--legit)",
   },
   {
     n: "03",
@@ -23,6 +25,7 @@ const PILLARS = [
     tag: "Fused detector",
     desc: "Gradient boosting + graph propagation + content-language scoring fused into one risk score, with grounded, attribution-based explanations for every flagged transaction.",
     Icon: IconShield,
+    color: "var(--accent-2)",
   },
 ];
 
@@ -51,14 +54,14 @@ export default function PillarsSection() {
               <div className="flex items-center gap-3 mb-4">
                 <span
                   className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ border: "1.5px solid var(--border-strong)" }}
+                  style={{ border: `1.5px solid ${p.color}`, background: `color-mix(in srgb, ${p.color} 8%, transparent)` }}
                 >
-                  <p.Icon color="var(--accent)" />
+                  <p.Icon color={p.color} />
                 </span>
                 <span className="data text-xs" style={{ color: "var(--muted)" }}>{p.n}</span>
               </div>
               <h3 className="text-lg font-semibold">{p.title}</h3>
-              <div className="text-xs mb-3 font-medium" style={{ color: "var(--accent)" }}>
+              <div className="text-xs mb-3 font-medium" style={{ color: p.color }}>
                 {p.tag}
               </div>
               <p className="text-sm" style={{ color: "var(--muted)" }}>

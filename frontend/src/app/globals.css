@@ -196,6 +196,25 @@ button:focus-visible {
   color: transparent;
 }
 
+/* Mesh spotlight: the one deliberately loud surface in the system -- a deep-ink
+   panel lit by three saturated color pools (violet/blue/emerald). Used exactly
+   twice (landing final CTA, console run summary) as a reward moment, never as
+   page background, so it reads as a considered set-piece rather than a template
+   glow-blob. White text only inside this surface. */
+.mesh-spotlight {
+  position: relative;
+  overflow: hidden;
+  background-color: #0a0c1a;
+  background-image:
+    radial-gradient(130% 160% at 10% -10%, color-mix(in srgb, #17d9a3 80%, transparent), transparent 55%),
+    radial-gradient(120% 150% at 90% 0%, color-mix(in srgb, var(--accent-2) 75%, transparent), transparent 55%),
+    radial-gradient(140% 170% at 50% 120%, color-mix(in srgb, var(--accent) 80%, transparent), transparent 60%);
+  color: #f4f5ff;
+}
+.mesh-spotlight .mesh-muted {
+  color: rgba(244, 245, 255, 0.72);
+}
+
 /* Outlined numbered badge -- a ring, not a filled disc. Lighter, more
    drafting-table than template-hero. */
 .badge-outline {

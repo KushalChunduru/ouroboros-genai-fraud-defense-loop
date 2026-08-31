@@ -26,7 +26,7 @@ export default function Hero() {
       >
         <div className="eyebrow mb-5">Mastercard Innovation Challenge · GFF 2026</div>
 
-        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight leading-[1.1]">
+        <h1 className="text-5xl md:text-7xl font-semibold tracking-tighter leading-[0.98]">
           The attack and the defense, trained in{" "}
           <span className="text-gradient">the same loop</span>.
         </h1>
