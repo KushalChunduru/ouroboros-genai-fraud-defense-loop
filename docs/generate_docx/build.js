@@ -1,8 +1,10 @@
 const {
   Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell,
   WidthType, ShadingType, BorderStyle, AlignmentType, LevelFormat, PageBreak,
-  TableOfContents, Header, Footer, PageNumber, VerticalAlign,
+  TableOfContents, Header, Footer, PageNumber, VerticalAlign, ImageRun,
 } = require("docx");
+const fs = require("fs");
+const path = require("path");
 
 const PAGE = { width: 12240, height: 15840 }; // US Letter
 const MARGIN = { top: 1080, bottom: 1080, left: 1080, right: 1080 };
@@ -38,6 +40,35 @@ function hr() {
 }
 function pageBreak() {
   return new Paragraph({ children: [new PageBreak()] });
+}
+/** A small, deliberate, consistent gap -- instead of a full-height blank
+ * paragraph (which reads as an arbitrary extra line whose size depends on
+ * whatever text style happened to precede it). Used only where a Table
+ * needs breathing room from the text around it, since Table has no
+ * spacing-before/after property of its own. */
+function spacer(size = 160) {
+  return new Paragraph({ children: [new TextRun({ text: "", size: 2 })], spacing: { before: 0, after: size } });
+}
+function architectureDiagram() {
+  const buf = fs.readFileSync(path.join(__dirname, "architecture.png"));
+  return new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: { before: 120, after: 80 },
+    children: [
+      new ImageRun({
+        type: "png",
+        data: buf,
+        transformation: { width: 620, height: 349 },
+      }),
+    ],
+  });
+}
+function figureCaption(text) {
+  return new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: { after: 260 },
+    children: [new TextRun({ text, italics: true, color: MUTED, size: 16 })],
+  });
 }
 
 /** A left-accent highlighted note — for the moments worth slowing down on
@@ -284,12 +315,19 @@ const doc = new Document({
           "The system is implemented as a FastAPI backend (Python, scikit-learn, networkx, Google Gemini) and a Next.js/TypeScript prototype console, and is fully demoable offline — every GenAI call degrades transparently to a deterministic template when no API key is configured."
         ),
 
+        h2("Architecture at a Glance"),
+        p(
+          "The pipeline runs left to right — Identify, Generate, Defend — and closes twice via the two dashed feedback paths: the self-play arms race escalates evasion specifically on what the detector just caught, and zero-day discovery mines the detector's blind spot for candidate attack vectors it proposes back into the taxonomy."
+        ),
+        architectureDiagram(),
+        figureCaption("Figure 1. The closed loop: three pillars plus the two feedback mechanisms that make it a loop, not a pipeline."),
+
         h1("2. Pillar 1 — Identify: A Living, Grounded Taxonomy"),
         p(
           "Rather than a short anecdotal list, the taxonomy tags every vector across four independent axes — channel, payment rail, social-engineering surface, and technique family — so coverage is provably broad. Each vector is grounded in a specific 2026 industry or academic source rather than invented from first principles, and every one of those 15 citations was individually verified by live web search and is rendered as a real, working hyperlink in the console rather than an italicized name — one citation that could not be independently verified during that pass was corrected rather than left in. The taxonomy is implemented as living data (backend/app/taxonomy.json) that the Zero-Day Discovery agent (Section 4.3) can append to automatically."
         ),
         taxonomyTable(),
-        p(""),
+        spacer(),
         p(
           "Two vectors deserve particular attention because they target Mastercard's own strategic exposure: AI shopping-agent hijacking and agentic credential exfiltration both attack the agentic-commerce protocols (Google's Universal Commerce Protocol, OpenAI's Agentic Commerce Protocol) that launched in January 2026 with Mastercard, Visa, and Stripe as partners. Visa's Payment Ecosystem Risk and Control team reported a 450%+ increase in dark-web posts mentioning 'AI Agent' in H1 2026, and HUMAN Security has already documented AI shopping agents autonomously running carding attacks — this is a live, not hypothetical, threat surface with almost no public defensive tooling yet."
         ),
@@ -315,7 +353,7 @@ const doc = new Document({
           "Citing arXiv:2604.13125 establishes that naive generators have this failure mode; it does not by itself prove our generator avoids it. The prototype includes a Fidelity Lab that closes that gap: for any generated batch, it builds the exact naive-generator baseline the paper describes — not by training a GAN, but by independently shuffling that batch's entity_id, device_id, ip_subnet, and timestamp columns. This operation is mathematically what a row-independent generator (CTGAN, TVAE, GaussianCopula) produces: every column's marginal distribution is preserved exactly (same amounts, same categories, same counts), while all cross-column joint structure is destroyed. Comparing the real batch against this shuffled twin isolates precisely the effect entity-conditioning has, computed live and reproducibly rather than asserted."
         ),
         fidelityTable(),
-        p(""),
+        spacer(),
         pullQuote(
           "One result was not the one hypothesized going in, and is reported here rather than adjusted away: an initial device-fan-out Gini metric moved in the opposite direction expected. Investigating why surfaced a more interesting finding than originally assumed — naive shuffling does not just fail to fabricate fraud rings well, it corrupts the legitimate class: a real customer's repeat visits to their own device get scattered across many fake owners, so an ordinary loyal customer starts looking exactly like a fraud ring. The single-owner-device-fraction metric above measures that effect directly and was verified directionally stable across three independent random seeds on realistic 1,000-row batches before being shipped."
         ),
@@ -325,13 +363,13 @@ const doc = new Document({
           "The detector fuses three independently-interpretable signals, echoing the shape of Mastercard's own Decision Intelligence Pro architecture — a transformer/relationship model over both transaction features and entity relationships, rather than a plain row-level classifier:"
         ),
         pipelineTable(),
-        p(""),
+        spacer(),
         h2("4.1 Efficacy results"),
         p(
           "On a representative simulated batch (1,000 transactions: 400 legitimate, 600 across all 15 attack vectors, 65/35 train/test split, held-out evaluation):"
         ),
         metricsTable(),
-        p(""),
+        spacer(),
         p(
           "Per-vector recall ranges from 73% (single-shot deepfake voice IVR fraud, which by design leaves only one transaction and therefore the weakest graph signal) to 100% (vectors with reused device/IP infrastructure, where the graph-propagation signal dominates) — an honest, non-trivial spread rather than a uniform 100%, because roughly 20% of attack instances in every vector deliberately rotate a throwaway device and legitimate traffic includes intentional hard negatives (shared household devices, one-off large purchases, occasional high-novelty sessions)."
         ),
@@ -379,9 +417,9 @@ const doc = new Document({
         bullet("Operational fit: a bank could run N self-play rounds against a candidate detector before shipping it, and route the zero-day agent's hypotheses into an analyst review queue rather than auto-updating the taxonomy unsupervised — keeping a human in the loop for the highest-stakes decision."),
         bullet("Strategic fit: the agentic-commerce vectors target exactly the surface Mastercard is exposing via UCP/ACP partnerships in 2026, ahead of most public defensive tooling."),
         bullet("Explainability: attribution-grounded investigator notes (Section 4.2) map directly onto a compliance/SAR workflow rather than stopping at a bare probability score."),
-        p(""),
+        spacer(),
         feasibilityTable(),
-        p(""),
+        spacer(),
         pullQuote(
           "Stated plainly rather than glossed over: the prototype's data store is process-local and in-memory, appropriate for a demo, not a production deployment — a real deployment would back batches, trained models, and reports with a real datastore and per-session isolation. This is called out explicitly in the codebase (backend/app/store.py) and was the subject of a concrete fix during development: detectors are now keyed by batch_id rather than a single 'last trained' pointer, so that scoring two different batches in the same process session does not silently corrupt each other's results — verified with two real batches scored back to back.",
           { accent: ACCENT2, fill: TINT2 }
