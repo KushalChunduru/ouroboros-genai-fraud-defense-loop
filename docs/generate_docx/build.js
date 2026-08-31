@@ -46,7 +46,7 @@ function cell(text, { header = false, width = 2000, shade = null } = {}) {
 function taxonomyTable() {
   const rows = [
     ["Vector", "Channel", "Technique", "Grounding source"],
-    ["Real-time deepfake voice IVR authorization", "IVR / call center", "Deepfake impersonation", "Adaptive Security / didit.me 2026"],
+    ["Real-time deepfake voice IVR authorization", "IVR / call center", "Deepfake impersonation", "Adaptive Security, 2026"],
     ["Deepfake video executive wire authorization", "P2P wallet / ACH", "Deepfake impersonation", "2024 $25M HK deepfake CFO case"],
     ["AI shopping-agent hijack via prompt injection", "Agentic checkout", "Prompt injection / agent hijack", "Signifyd / Darwinium 2026"],
     ["Autonomous AI-agent carding bursts", "Agentic checkout", "GenAI-scaled carding", "HUMAN Security, 2026"],
@@ -187,7 +187,7 @@ const doc = new Document({
         h1("3. Pillar 2 — Generate: Entity-Conditioned Simulation, Not Row-Independent GANs"),
         h2("3.1 The problem with naive tabular generators"),
         p(
-          "A June 2026 benchmark (arXiv:2604.13125, 'Synthetic Tabular Generators Fail to Preserve Behavioral Fraud Patterns') showed that standard tabular generators — CTGAN, TVAE, GaussianCopula, TabularARGN — are 24x to 39x worse than real data at preserving exactly the three signals fraud detection depends on: temporal burst autocorrelation, device/IP graph fan-out motifs, and velocity-rule trigger calibration. The root cause is architectural: these generators sample each row independently, with no memory of an entity's prior transactions."
+          "A June 2026 benchmark (arXiv:2604.13125, 'Synthetic Tabular Generators Fail to Preserve Behavioral Fraud Patterns') showed that standard tabular generators — CTGAN, TVAE, GaussianCopula, TabularARGN — are 17x to 100x worse than real data at preserving exactly the three signals fraud detection depends on: temporal burst autocorrelation, device/IP graph fan-out motifs, and velocity-rule trigger calibration. The root cause is architectural: these generators sample each row independently, with no memory of an entity's prior transactions."
         ),
         h2("3.2 Our approach"),
         p(

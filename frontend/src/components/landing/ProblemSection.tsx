@@ -20,7 +20,7 @@ const STATS = [
     href: "https://www.biia.com/synthetic-identity-fraud-statistics-2026-hard-numbers-big-threats/",
   },
   {
-    value: "24–39×",
+    value: "17–100×",
     label: "worse behavioral fidelity, naive GAN data",
     sub: "arXiv:2604.13125, 2026",
     href: "https://arxiv.org/abs/2604.13125",

@@ -1,7 +1,7 @@
 """Layer B of the Generate pillar: entity-conditioned behavioral simulator.
 
 Unlike row-independent tabular generators (CTGAN/TVAE/GaussianCopula), which a
-2026 benchmark (arXiv:2604.13125) showed are 24x-39x worse than real data at
+2026 benchmark (arXiv:2604.13125) showed are 17x-100x worse than real data at
 preserving temporal burst autocorrelation, device/IP graph fan-out motifs, and
 velocity-rule calibration, this simulator gives every entity persistent state
 (known devices, home merchant categories, typical amount distribution, session
