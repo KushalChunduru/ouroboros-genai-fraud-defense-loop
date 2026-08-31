@@ -156,7 +156,7 @@ function Cell({ label, value, color, info }: { label: string; value: string; col
   return (
     <div className="p-3" style={{ background: "var(--background)" }}>
       <div className="data text-lg font-semibold" style={{ color: color ?? "var(--foreground)" }}>{value}</div>
-      <div className="flex items-center gap-1.5 text-[10px] mt-0.5" style={{ color: "var(--muted)" }}>
+      <div className="data flex items-center gap-1.5 text-[10px] mt-0.5 uppercase tracking-wide" style={{ color: "var(--muted)" }}>
         {label}
         {info && <InfoTooltip title={label}>{info}</InfoTooltip>}
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import OuroborosMark from "./landing/OuroborosMark";
@@ -16,6 +17,7 @@ const ICONS = [IconRadar, IconSpark, IconShield, IconMicroscope, IconReport];
 export default function ConsoleSidebar({ stages }: { stages: Stage[] }) {
   const [health, setHealth] = useState<{ status: string; gemini_enabled: boolean; vectors: number } | null>(null);
   const [error, setError] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     api.health().then(setHealth).catch(() => setError(true));
@@ -34,11 +36,11 @@ export default function ConsoleSidebar({ stages }: { stages: Stage[] }) {
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-thin">
         {stages.map((s, i) => {
           const Icon = ICONS[i] ?? IconReport;
-          const active = s.status === "current";
+          const active = pathname === s.href;
           return (
-            <a
+            <Link
               key={s.id}
-              href={`#${s.id}`}
+              href={s.href}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
               style={{
                 background: active ? "var(--surface-2)" : "transparent",
@@ -51,7 +53,7 @@ export default function ConsoleSidebar({ stages }: { stages: Stage[] }) {
               {s.status === "done" && (
                 <span className="data ml-auto text-[10px]" style={{ color: "var(--accent)" }}>✓</span>
               )}
-            </a>
+            </Link>
           );
         })}
       </nav>

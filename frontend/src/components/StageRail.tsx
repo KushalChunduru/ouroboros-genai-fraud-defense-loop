@@ -1,16 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import OuroborosMark from "./landing/OuroborosMark";
 
 export type StageStatus = "done" | "current" | "pending";
-export type Stage = { id: string; label: string; status: StageStatus };
+export type Stage = { id: string; href: string; label: string; status: StageStatus };
 
 export default function StageRail({ stages }: { stages: Stage[] }) {
   const [health, setHealth] = useState<{ status: string; gemini_enabled: boolean; vectors: number } | null>(null);
   const [error, setError] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     api.health().then(setHealth).catch(() => setError(true));
@@ -26,17 +28,20 @@ export default function StageRail({ stages }: { stages: Stage[] }) {
 
         <nav className="order-3 md:order-2 w-full md:w-auto flex gap-1 overflow-x-auto scrollbar-thin">
           {stages.map((s, i) => (
-            <a
+            <Link
               key={s.id}
-              href={`#${s.id}`}
+              href={s.href}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm shrink-0 whitespace-nowrap transition-colors"
-              style={{ color: s.status === "pending" ? "var(--muted)" : "var(--foreground)" }}
+              style={{
+                color: s.status === "pending" ? "var(--muted)" : "var(--foreground)",
+                background: pathname === s.href ? "var(--surface-2)" : undefined,
+              }}
             >
               <span className="data badge-outline h-4 w-4 text-[9px] shrink-0" data-state={s.status}>
                 {s.status === "done" ? "✓" : i + 1}
               </span>
               {s.label}
-            </a>
+            </Link>
           ))}
         </nav>
 

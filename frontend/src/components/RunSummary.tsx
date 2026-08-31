@@ -93,7 +93,7 @@ function SummaryCell({ label, value, color, spotlight }: { label: string; value:
   return (
     <div className="p-4" style={{ background: spotlight ? "transparent" : "var(--background)" }}>
       <div className="data text-xl font-semibold" style={{ color: color ?? (spotlight ? "#f2fffb" : "var(--foreground)") }}>{value}</div>
-      <div className="text-xs mt-1" style={spotlight ? { color: "rgba(242,255,251,0.7)" } : { color: "var(--muted)" }}>{label}</div>
+      <div className="data text-[10px] mt-1 uppercase tracking-wide" style={spotlight ? { color: "rgba(242,255,251,0.7)" } : { color: "var(--muted)" }}>{label}</div>
     </div>
   );
 }

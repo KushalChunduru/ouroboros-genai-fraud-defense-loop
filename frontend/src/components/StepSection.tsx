@@ -5,16 +5,18 @@ export default function StepSection({
   index,
   title,
   status,
+  divider = true,
   children,
 }: {
   id: string;
   index: number;
   title: string;
   status: "done" | "current" | "pending";
+  divider?: boolean;
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-20 py-10 border-t" style={{ borderColor: "var(--border)" }}>
+    <section id={id} className="scroll-mt-20 py-10" style={divider ? { borderTop: "1px solid var(--border)" } : undefined}>
       <div className="flex items-center gap-3 mb-5">
         <span className="data badge-outline h-8 w-8 text-sm shrink-0" data-state={status}>
           {status === "done" ? "✓" : index}
