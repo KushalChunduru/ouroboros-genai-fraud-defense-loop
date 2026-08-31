@@ -25,20 +25,20 @@ export default function ProblemSection() {
         </div>
 
         <div className="grid md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-0 items-stretch">
-          <div className="mesh-warm rounded-3xl p-7 md:p-9 flex flex-col">
-            <div className="eyebrow mb-4" style={{ color: "rgba(255,244,239,0.65)" }}>
+          <div className="tile-coral rounded-3xl p-7 md:p-9 flex flex-col">
+            <div className="eyebrow mb-4" style={{ color: "#b8541f" }}>
               The problem we found
             </div>
-            <p className="text-base md:text-lg font-medium leading-snug">
+            <p className="text-base md:text-lg font-medium leading-snug" style={{ color: "#4a2515" }}>
               Deepfake voices pass IVR authentication. Autonomous shopping agents run carding attacks at machine
               speed. Synthetic identities build six months of credit history before bust-out — and the synthetic
               data used to train defenses doesn&apos;t even preserve the signal detection depends on.
             </p>
-            <div className="flex flex-wrap gap-x-6 gap-y-4 mt-7 pt-6" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
+            <div className="flex flex-wrap gap-x-6 gap-y-4 mt-7 pt-6" style={{ borderTop: "1px solid #ffd2ba" }}>
               {STATS.map((s) => (
                 <div key={s.label} className="min-w-[130px]">
-                  <div className="data text-xl font-semibold">{s.value}</div>
-                  <div className="text-xs mt-0.5 mesh-muted">{s.label}</div>
+                  <div className="data text-xl font-semibold" style={{ color: "#7a3315" }}>{s.value}</div>
+                  <div className="text-xs mt-0.5" style={{ color: "#a8623a" }}>{s.label}</div>
                 </div>
               ))}
             </div>
@@ -46,21 +46,21 @@ export default function ProblemSection() {
 
           <FlowConnector />
 
-          <div className="mesh-cool rounded-3xl p-7 md:p-9 flex flex-col">
-            <div className="eyebrow mb-4" style={{ color: "rgba(238,242,255,0.65)" }}>
+          <div className="tile-teal rounded-3xl p-7 md:p-9 flex flex-col">
+            <div className="eyebrow mb-4" style={{ color: "#0d8f82" }}>
               The system we built
             </div>
-            <p className="text-base md:text-lg font-medium leading-snug mb-6">
+            <p className="text-base md:text-lg font-medium leading-snug mb-6" style={{ color: "#0f3d34" }}>
               A closed loop, not a slide: the taxonomy, the simulator, and the detector all feed each other — and
               the whole thing runs live in the console below.
             </p>
             <div className="space-y-4 mt-auto pt-2">
               {FIXES.map((f) => (
                 <div key={f.label} className="flex gap-3">
-                  <span className="h-1.5 w-1.5 rounded-full shrink-0 mt-2" style={{ background: "#eef2ff" }} />
+                  <span className="h-1.5 w-1.5 rounded-full shrink-0 mt-2" style={{ background: "#0d8f82" }} />
                   <div>
-                    <div className="text-sm font-semibold">{f.label}</div>
-                    <div className="text-xs mesh-muted mt-0.5">{f.text}</div>
+                    <div className="text-sm font-semibold" style={{ color: "#0f3d34" }}>{f.label}</div>
+                    <div className="text-xs mt-0.5" style={{ color: "#3d7268" }}>{f.text}</div>
                   </div>
                 </div>
               ))}

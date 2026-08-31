@@ -53,8 +53,8 @@ export default function PillarsSection() {
             >
               <div className="flex items-center gap-3 mb-4">
                 <span
-                  className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ border: `1.5px solid ${p.color}`, background: `color-mix(in srgb, ${p.color} 8%, transparent)` }}
+                  className="icon-bubble h-12 w-12 shrink-0"
+                  style={{ background: `color-mix(in srgb, ${p.color} 16%, white)` }}
                 >
                   <p.Icon color={p.color} />
                 </span>

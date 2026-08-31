@@ -14,9 +14,9 @@
   /* Semantic data colors: each has ONE meaning, used only where that
      meaning applies (interactive/legit/fraud/uncertain) -- never decorative.
      Deepened from the dark-theme values so each holds AA contrast on white. */
-  --accent: #5b3df0;   /* interactive: links, primary actions, active state */
-  --accent-2: #0090ff; /* secondary accent -- gradient partner, sparingly */
-  --legit: #04976f;    /* legitimate / recall / "caught correctly" */
+  --accent: #0d8f82;   /* interactive: links, primary actions, active state -- warm trust-teal */
+  --accent-2: #f2790c; /* secondary accent -- warm coral/orange, gradient + illustration partner */
+  --legit: #16825f;    /* legitimate / recall / "caught correctly" */
   --danger: #d61f56;   /* attack / fraud / false positive */
   --warn: #b3690a;     /* severity / uncertainty / needs review */
 
@@ -191,59 +191,51 @@ button:focus-visible {
   color: transparent;
 }
 
-/* Mesh spotlight: the one deliberately loud surface in the system -- a deep-ink
-   panel lit by three saturated color pools (violet/blue/emerald). Used exactly
-   twice (landing final CTA, console run summary) as a reward moment, never as
-   page background, so it reads as a considered set-piece rather than a template
-   glow-blob. White text only inside this surface. */
-.mesh-spotlight {
+/* Block-teal: the one deliberately loud surface in the system -- a solid
+   trust-teal band, not a dark panel. Matches the friendly fintech-aggregator
+   reference's bold color-block CTA ("everything starts and ends with you").
+   Used as a reward moment (landing final CTA, console run summary), never as
+   page background. White text only inside this surface. */
+.block-teal {
   position: relative;
   overflow: hidden;
-  background-color: #0a0c1a;
-  background-image:
-    radial-gradient(130% 160% at 10% -10%, color-mix(in srgb, #17d9a3 80%, transparent), transparent 55%),
-    radial-gradient(120% 150% at 90% 0%, color-mix(in srgb, var(--accent-2) 75%, transparent), transparent 55%),
-    radial-gradient(140% 170% at 50% 120%, color-mix(in srgb, var(--accent) 80%, transparent), transparent 60%);
-  color: #f4f5ff;
+  background: linear-gradient(135deg, #0a6e64, var(--accent) 55%, #12a695);
+  color: #f2fffb;
 }
-.mesh-spotlight .mesh-muted {
-  color: rgba(244, 245, 255, 0.72);
+.block-teal .mesh-muted {
+  color: rgba(242, 255, 251, 0.78);
 }
 
 /* Light mesh: the hero band -- a saturated color pool bleeding to white,
    dark text on top. Full-bleed, sits behind the nav so the hero reads as
    one continuous surface instead of a bar-plus-content stack. */
 .mesh-hero {
-  background-color: #fbfdfd;
+  background-color: #fbfdfb;
   background-image:
-    radial-gradient(85% 130% at 8% -10%, color-mix(in srgb, #17d9a3 42%, transparent), transparent 62%),
-    radial-gradient(70% 110% at 100% -20%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 58%);
+    radial-gradient(85% 130% at 8% -10%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 62%),
+    radial-gradient(70% 110% at 100% -20%, color-mix(in srgb, var(--accent-2) 22%, transparent), transparent 58%);
 }
 
-/* Problem/solution duet: two mesh panels in one warm-to-cool pairing,
-   lifted straight from the reference's "problem we found / system we
-   built" flow -- the diagnosis and the fix get equal visual weight. */
-.mesh-warm {
-  position: relative;
-  overflow: hidden;
-  background-color: #1a0e0a;
-  background-image:
-    radial-gradient(120% 150% at 15% 10%, color-mix(in srgb, #ff7a4d 75%, transparent), transparent 58%),
-    radial-gradient(110% 140% at 100% 100%, color-mix(in srgb, var(--danger) 55%, transparent), transparent 60%);
-  color: #fff4ef;
+/* Problem/solution duet: two soft pastel tiles, warm-to-cool pairing --
+   lifted from the reference's "problem we found / system we built" flow,
+   translated into the reference's light, illustration-forward palette
+   rather than a dark panel. Dark text throughout, tinted icon dots. */
+.tile-coral {
+  background: linear-gradient(165deg, #fff1ea, #ffe3d6);
+  border: 1px solid #ffd2ba;
 }
-.mesh-cool {
-  position: relative;
-  overflow: hidden;
-  background-color: #0a1020;
-  background-image:
-    radial-gradient(120% 150% at 85% 10%, color-mix(in srgb, var(--accent-2) 70%, transparent), transparent 58%),
-    radial-gradient(110% 140% at 0% 100%, color-mix(in srgb, var(--accent) 65%, transparent), transparent 60%);
-  color: #eef2ff;
+.tile-teal {
+  background: linear-gradient(165deg, #e9fbf6, #d7f5ec);
+  border: 1px solid #b7e8da;
 }
-.mesh-warm .mesh-muted,
-.mesh-cool .mesh-muted {
-  color: rgba(255, 255, 255, 0.7);
+
+/* Circular tinted icon badge -- the reference's soft-bubble icon treatment,
+   used for pillar/feature icons instead of a hairline square. */
+.icon-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
 }
 
 /* Outlined numbered badge -- a ring, not a filled disc. Lighter, more

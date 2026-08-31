@@ -29,25 +29,25 @@ export default function RunSummary({
 
   return (
     <div className="space-y-4">
-      <div className="mesh-spotlight rounded-2xl p-6 md:p-8">
+      <div className="block-teal rounded-2xl p-6 md:p-8">
         <div className="flex items-center justify-between gap-3 mb-6">
           <span className="text-sm mesh-muted">
-            Batch <span className="data" style={{ color: "#f4f5ff" }}>{gen.batch_id}</span>
+            Batch <span className="data" style={{ color: "#f2fffb" }}>{gen.batch_id}</span>
           </span>
           <Link
             href={`/console/report/${gen.batch_id}`}
             className="btn text-xs"
             target="_blank"
-            style={{ border: "1px solid rgba(244,245,255,0.35)", color: "#f4f5ff" }}
+            style={{ border: "1px solid rgba(242,255,251,0.35)", color: "#f2fffb" }}
           >
             Share this run as a standalone link →
           </Link>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: "rgba(244,245,255,0.14)" }}>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: "rgba(242,255,251,0.16)" }}>
           <SummaryCell label="Vectors tested" value={String(selected.length || "all 15")} spotlight />
           <SummaryCell label="Batch size" value={String(gen.counts.total)} spotlight />
-          <SummaryCell label="Detector F1" value={`${(det.overall.f1 * 100).toFixed(1)}%`} color="#17d9a3" spotlight />
-          <SummaryCell label="False positive rate" value={`${(det.overall.false_positive_rate * 100).toFixed(1)}%`} color="#ff8fa8" spotlight />
+          <SummaryCell label="Detector F1" value={`${(det.overall.f1 * 100).toFixed(1)}%`} color="#eafff8" spotlight />
+          <SummaryCell label="False positive rate" value={`${(det.overall.false_positive_rate * 100).toFixed(1)}%`} color="#ffd9a8" spotlight />
         </div>
       </div>
 
@@ -92,8 +92,8 @@ export default function RunSummary({
 function SummaryCell({ label, value, color, spotlight }: { label: string; value: string; color?: string; spotlight?: boolean }) {
   return (
     <div className="p-4" style={{ background: spotlight ? "transparent" : "var(--background)" }}>
-      <div className="data text-xl font-semibold" style={{ color: color ?? (spotlight ? "#f4f5ff" : "var(--foreground)") }}>{value}</div>
-      <div className="text-xs mt-1" style={spotlight ? { color: "rgba(244,245,255,0.65)" } : { color: "var(--muted)" }}>{label}</div>
+      <div className="data text-xl font-semibold" style={{ color: color ?? (spotlight ? "#f2fffb" : "var(--foreground)") }}>{value}</div>
+      <div className="text-xs mt-1" style={spotlight ? { color: "rgba(242,255,251,0.7)" } : { color: "var(--muted)" }}>{label}</div>
     </div>
   );
 }

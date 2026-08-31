@@ -5,13 +5,13 @@ export default function FinalCTA() {
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
       <Reveal>
-        <div className="mesh-spotlight rounded-3xl px-8 py-14 md:px-16 md:py-20 flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div className="block-teal rounded-3xl px-8 py-14 md:px-16 md:py-20 flex flex-col md:flex-row md:items-center justify-between gap-8">
           <div>
-            <div className="eyebrow mb-4" style={{ color: "rgba(244,245,255,0.6)" }}>
+            <div className="eyebrow mb-4" style={{ color: "rgba(242,255,251,0.65)" }}>
               Ready when you are
             </div>
             <h2 className="text-3xl md:text-5xl font-semibold tracking-tight max-w-lg leading-[1.05]">
-              Run the loop yourself — no setup required
+              Everything here starts and ends with you
             </h2>
             <p className="mesh-muted text-sm md:text-base mt-4 max-w-lg">
               Every screen runs live against the real backend. Pick attack vectors, generate a batch, score it, and
@@ -21,7 +21,7 @@ export default function FinalCTA() {
           <Link
             href="/console"
             className="btn shrink-0"
-            style={{ background: "white", color: "#0a0c1a", fontWeight: 600 }}
+            style={{ background: "white", color: "#0a6e64", fontWeight: 600 }}
           >
             Launch the console →
           </Link>
