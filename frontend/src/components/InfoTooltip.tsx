@@ -48,22 +48,23 @@ export default function InfoTooltip({
         i
       </button>
       {open && (
-        <div
+        <span
           role="tooltip"
           className="card-2 absolute z-30 p-3 text-xs"
           style={{
+            display: "block",
             top: "calc(100% + 6px)",
             [align]: 0,
             width: 240,
-            boxShadow: "0 12px 28px -8px rgba(0,0,0,0.55)",
+            boxShadow: "var(--shadow-lg)",
             textTransform: "none",
             letterSpacing: "normal",
             fontWeight: 400,
           }}
         >
-          {title && <div className="font-medium mb-1" style={{ color: "var(--accent)" }}>{title}</div>}
-          <div style={{ color: "var(--muted)" }}>{children}</div>
-        </div>
+          {title && <span className="font-medium mb-1" style={{ display: "block", color: "var(--accent)" }}>{title}</span>}
+          <span style={{ display: "block", color: "var(--muted)" }}>{children}</span>
+        </span>
       )}
     </span>
   );

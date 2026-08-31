@@ -257,7 +257,7 @@ export default function GenerateDetectConsole({
                     <span className="data">{s.id}</span>
                     <span
                       className="pill"
-                      style={{ background: s.is_attack ? "rgba(255,92,122,0.15)" : "rgba(255,180,84,0.15)", color: s.is_attack ? "var(--danger)" : "var(--warn)", borderColor: "transparent" }}
+                      style={{ background: s.is_attack ? "color-mix(in srgb, var(--danger) 15%, white)" : "color-mix(in srgb, var(--warn) 15%, white)", color: s.is_attack ? "var(--danger)" : "var(--warn)", borderColor: "transparent" }}
                     >
                       fused {s.fused_score.toFixed(2)} · {s.is_attack ? "true attack" : "false positive"}
                     </span>

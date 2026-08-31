@@ -87,7 +87,7 @@ function MetricRow({
       <div className="flex items-center justify-between mb-1">
         <span className="text-sm font-medium">{label}</span>
         {ratio !== null && ratio > 1.05 && (
-          <span className="pill" style={{ color: "var(--legit)", borderColor: "transparent", background: "rgba(53,226,194,0.12)" }}>
+          <span className="pill" style={{ color: "var(--legit)", borderColor: "transparent", background: "color-mix(in srgb, var(--legit) 12%, white)" }}>
             {ratio.toFixed(1)}× more preserved
           </span>
         )}

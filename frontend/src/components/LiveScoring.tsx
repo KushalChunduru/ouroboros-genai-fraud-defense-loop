@@ -110,7 +110,9 @@ export default function LiveScoring({ vectors, detectorReady }: { vectors: Attac
             <span
               className="pill"
               style={{
-                background: result.predicted_attack ? "rgba(255,92,122,0.15)" : "rgba(53,226,194,0.15)",
+                background: result.predicted_attack
+                  ? "color-mix(in srgb, var(--danger) 12%, white)"
+                  : "color-mix(in srgb, var(--legit) 12%, white)",
                 color: result.predicted_attack ? "var(--danger)" : "var(--legit)",
                 borderColor: "transparent",
               }}

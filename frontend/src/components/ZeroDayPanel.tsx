@@ -86,7 +86,7 @@ export default function ZeroDayPanel({
               <div key={h.cluster_id} className="card-2 card-hover p-4 text-sm" style={{ borderLeft: "2.5px solid var(--warn)" }}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="data text-xs" style={{ color: "var(--muted)" }}>{h.cluster_id}</span>
-                  <span className="pill" style={{ background: "rgba(255,180,84,0.15)", color: "var(--warn)", borderColor: "transparent" }}>
+                  <span className="pill" style={{ background: "color-mix(in srgb, var(--warn) 15%, white)", color: "var(--warn)", borderColor: "transparent" }}>
                     confidence {(h.confidence * 100).toFixed(0)}%
                   </span>
                 </div>

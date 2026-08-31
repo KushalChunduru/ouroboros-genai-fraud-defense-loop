@@ -15,6 +15,7 @@ export default function Hero() {
 
   return (
     <section className="relative overflow-hidden">
+      <div className="hero-wash absolute inset-0 h-[520px]" aria-hidden="true" />
       <div className="dot-grid absolute inset-0 h-[420px]" aria-hidden="true" />
       <div className="relative max-w-6xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-20">
       <motion.div
@@ -27,7 +28,7 @@ export default function Hero() {
 
         <h1 className="text-4xl md:text-5xl font-semibold tracking-tight leading-[1.1]">
           The attack and the defense, trained in{" "}
-          <span style={{ color: "var(--accent)" }}>the same loop</span>.
+          <span className="text-gradient">the same loop</span>.
         </h1>
 
         <p className="mt-5 text-base md:text-lg max-w-xl" style={{ color: "var(--muted)" }}>
