@@ -176,7 +176,7 @@ const doc = new Document({
 
         h1("2. Pillar 1 — Identify: A Living, Grounded Taxonomy"),
         p(
-          "Rather than a short anecdotal list, the taxonomy tags every vector across four independent axes — channel, payment rail, social-engineering surface, and technique family — so coverage is provably broad. Each vector is grounded in a specific 2026 industry or academic source rather than invented from first principles. The taxonomy is implemented as living data (backend/app/taxonomy.json) that the Zero-Day Discovery agent (Section 4.2) can append to automatically."
+          "Rather than a short anecdotal list, the taxonomy tags every vector across four independent axes — channel, payment rail, social-engineering surface, and technique family — so coverage is provably broad. Each vector is grounded in a specific 2026 industry or academic source rather than invented from first principles, and every one of those 15 citations was individually verified by live web search and is rendered as a real, working hyperlink in the console rather than an italicized name — one citation that could not be independently verified during that pass was corrected rather than left in. The taxonomy is implemented as living data (backend/app/taxonomy.json) that the Zero-Day Discovery agent (Section 4.2) can append to automatically."
         ),
         taxonomyTable(),
         p(""),
@@ -255,9 +255,9 @@ const doc = new Document({
           "Agentic-checkout attack vectors (agentic_checkout_hijack, agentic_carding_burst, agent_credential_exfil) are scored by the same fused detector as classic card-present/card-not-present fraud, using session_novelty and tool_call_burst as behavioral-sequence features standing in for an AI shopping agent's prompt/tool-call/session trajectory — directly inspired by 2026 research proposing fraud-detection-style behavioral sequence modeling for securing LLM agents (arXiv:2605.01143). This means Ouroboros defends both the fraud era Mastercard has decades of data on and the fraud era it is only now becoming exposed to via UCP/ACP, without maintaining two separate detection systems."
         ),
 
-        h1("7. One Continuous Workflow, Not Four Disconnected Demos"),
+        h1("7. Five Connected Pages, One Shared Run — Not Five Disconnected Demos"),
         p(
-          "An earlier iteration of the console was four independent tabs; leaving one discarded its state, so the self-play and zero-day screens each silently generated their own fresh batch instead of building on the one already scored — four demos under one navigation bar, not a closed loop. The console was restructured as a single scrolling page with five sequential stages (Identify → Generate & Detect → Self-Play → Zero-Day → Summary): a progress rail replaces the tab switcher with numbered, checkmarked anchor links that never unmount state, the selected vectors and generated batch flow down as props so each stage genuinely builds on the last, Zero-Day Discovery defaults to reusing the exact batch and detector from Generate & Detect rather than a disconnected sample, and a closing Run Summary synthesizes every stage's real output — including honestly reporting which stages have not been run yet, rather than showing fabricated zeros."
+          "An earlier iteration of the console was four independent tabs; leaving one discarded its state, so the self-play and zero-day screens each silently generated their own fresh batch instead of building on the one already scored — four demos under one navigation bar, not a closed loop. That was first fixed by unifying everything into a single scrolling page, then taken further: each stage now lives on its own real, bookmarkable route (/console → /console/generate → /console/self-play → /console/zero-day → /console/summary) behind a left-sidebar dashboard nav, for the usability benefit of a direct, shareable link to any stage — while a shared React context (mirrored to sessionStorage) keeps the run's state — selected vectors, generated batch, detector, self-play rounds, zero-day hypotheses — alive across page loads, not just client-side navigation. A direct visit or a hard refresh of /console/summary restores the in-progress run instead of resetting it. Every stage page also ends with an explicit 'continue to the next stage' link, so the sequence the sidebar implies is walkable start to finish, not just jumpable."
         ),
         p(
           "Every scored batch additionally gets a standalone permalink report (/console/report/{batch_id}) — a separate page that fetches that specific run's cached results by ID and renders them read-only, shareable in a message without asking the recipient to re-run anything."
@@ -283,7 +283,7 @@ const doc = new Document({
         ),
 
         hr(),
-        p("Repository, prototype, and full source referenced throughout this document are included in the accompanying submission.", { italics: true, color: MUTED, size: 18 }),
+        p("Full source: github.com/KushalChunduru/ouroboros-genai-fraud-defense-loop — organized, documented, and reproducible per the README's setup instructions. Every file, endpoint, and citation referenced throughout this document lives in that repository.", { italics: true, color: MUTED, size: 18 }),
       ],
     },
   ],
