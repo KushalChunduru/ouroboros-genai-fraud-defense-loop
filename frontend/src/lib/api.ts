@@ -9,6 +9,7 @@ export type AttackVector = {
   technique: string;
   description: string;
   source: string;
+  source_url?: string;
   severity_base: number;
 };
 

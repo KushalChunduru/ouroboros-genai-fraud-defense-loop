@@ -98,35 +98,50 @@ export default function TaxonomyExplorer({
 
       <div className="grid md:grid-cols-2 gap-3">
         {filtered.map((v) => (
-          <button
+          <div
             key={v.id}
-            onClick={() => toggle(v.id)}
             className="card-2 card-hover p-4 text-left"
             style={{ borderColor: selected.includes(v.id) ? "var(--accent)" : undefined }}
           >
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="font-medium text-sm leading-snug">{v.name}</h3>
-              <span
-                className="text-[10px] px-1.5 py-0.5 rounded shrink-0 font-medium"
-                style={{ background: "color-mix(in srgb, var(--warn) 15%, transparent)", color: "var(--warn)" }}
-              >
-                sev {v.severity_base.toFixed(2)}
-              </span>
-            </div>
-            <p className="text-xs mt-1.5" style={{ color: "var(--muted)" }}>
-              {v.description}
-            </p>
-            <div className="flex flex-wrap gap-1 mt-2">
-              {[v.channel, v.rail, v.social_surface, v.technique].map((tag) => (
-                <span key={tag} className="pill capitalize" style={{ padding: "2px 8px", fontSize: "10px" }}>
-                  {tag.replace(/_/g, " ")}
+            <button onClick={() => toggle(v.id)} className="block w-full text-left">
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="font-medium text-sm leading-snug">{v.name}</h3>
+                <span
+                  className="text-[10px] px-1.5 py-0.5 rounded shrink-0 font-medium"
+                  style={{ background: "color-mix(in srgb, var(--warn) 15%, transparent)", color: "var(--warn)" }}
+                >
+                  sev {v.severity_base.toFixed(2)}
                 </span>
-              ))}
-            </div>
+              </div>
+              <p className="text-xs mt-1.5" style={{ color: "var(--muted)" }}>
+                {v.description}
+              </p>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {[v.channel, v.rail, v.social_surface, v.technique].map((tag) => (
+                  <span key={tag} className="pill capitalize" style={{ padding: "2px 8px", fontSize: "10px" }}>
+                    {tag.replace(/_/g, " ")}
+                  </span>
+                ))}
+              </div>
+            </button>
             <p className="text-[10px] mt-2 italic" style={{ color: "var(--muted)" }}>
-              source: {v.source}
+              source:{" "}
+              {v.source_url ? (
+                <a
+                  href={v.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="not-italic underline underline-offset-2"
+                  style={{ color: "var(--accent)" }}
+                >
+                  {v.source} ↗
+                </a>
+              ) : (
+                v.source
+              )}
             </p>
-          </button>
+          </div>
         ))}
       </div>
     </div>

@@ -35,7 +35,17 @@ export default function FidelityLab({ batchId }: { batchId: string }) {
         Builds a naive-generator baseline from this exact batch by independently shuffling entity, device, IP, and
         timestamp columns — preserving every marginal distribution exactly while destroying cross-column structure,
         which is mathematically what a row-independent generator (CTGAN, TVAE, GaussianCopula) produces. Then
-        compares the three signals arXiv:2604.13125 showed those generators fail to preserve.
+        compares the three signals{" "}
+        <a
+          href="https://arxiv.org/abs/2604.13125"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2"
+          style={{ color: "var(--accent)" }}
+        >
+          arXiv:2604.13125
+        </a>{" "}
+        showed those generators fail to preserve.
       </p>
       <button onClick={run} disabled={loading} className="btn btn-solid">
         {loading ? "Computing…" : "Run fidelity comparison"}

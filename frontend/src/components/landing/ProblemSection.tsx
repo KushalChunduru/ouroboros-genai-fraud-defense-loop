@@ -1,10 +1,30 @@
 import Reveal from "@/components/Reveal";
 
 const STATS = [
-  { value: "450%+", label: "dark-web “AI Agent” mentions", sub: "Visa PERC, H1 2026" },
-  { value: "1,265%", label: "YoY GenAI phishing emails", sub: "2026 phishing threat reporting" },
-  { value: "$30–35B", label: "annual US synthetic identity fraud", sub: "Experian / TransUnion, 2026" },
-  { value: "24–39×", label: "worse behavioral fidelity, naive GAN data", sub: "arXiv:2604.13125, 2026" },
+  {
+    value: "450%+",
+    label: "dark-web “AI Agent” mentions",
+    sub: "Visa PERC, H1 2026",
+    href: "https://corporate.visa.com/en/sites/visa-perspectives/security-trust/the-threats-landscape-of-agentic-commerce.html",
+  },
+  {
+    value: "1,265%",
+    label: "YoY GenAI phishing emails",
+    sub: "SentinelOne, 2026 phishing threat reporting",
+    href: "https://www.sentinelone.com/cybersecurity-101/cybersecurity/cyber-security-statistics/",
+  },
+  {
+    value: "$30–35B",
+    label: "annual US synthetic identity fraud",
+    sub: "Experian / TransUnion, 2026",
+    href: "https://www.biia.com/synthetic-identity-fraud-statistics-2026-hard-numbers-big-threats/",
+  },
+  {
+    value: "24–39×",
+    label: "worse behavioral fidelity, naive GAN data",
+    sub: "arXiv:2604.13125, 2026",
+    href: "https://arxiv.org/abs/2604.13125",
+  },
 ];
 
 const PROBLEM_TAGS = ["#GenAI-Fraud", "#Behavioral-Fidelity", "#Adaptive-Adversary"];
@@ -73,11 +93,20 @@ export default function ProblemSection() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px mt-4" style={{ background: "var(--border)" }}>
           {STATS.map((s) => (
-            <div key={s.label} className="p-5 flex flex-col gap-2" style={{ background: "var(--background)" }}>
+            <a
+              key={s.label}
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-5 flex flex-col gap-2 card-hover"
+              style={{ background: "var(--background)" }}
+            >
               <span className="data text-2xl md:text-3xl font-semibold">{s.value}</span>
               <span className="text-sm" style={{ color: "var(--foreground)" }}>{s.label}</span>
-              <span className="text-xs mt-auto" style={{ color: "var(--muted)" }}>{s.sub}</span>
-            </div>
+              <span className="text-xs mt-auto underline underline-offset-2" style={{ color: "var(--muted)" }}>
+                {s.sub} ↗
+              </span>
+            </a>
           ))}
         </div>
       </Reveal>

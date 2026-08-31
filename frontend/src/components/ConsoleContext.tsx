@@ -45,22 +45,45 @@ function loadPersisted(): Persisted | null {
    Also mirrored to sessionStorage: these are now real, bookmarkable URLs,
    so a direct visit or refresh of e.g. /console/summary needs the same
    run data a client-side Link click would have carried, not an empty
-   "run Generate & Detect first" state. */
+   "run Generate & Detect first" state.
+
+   State always STARTS at the plain default (matching what the server
+   rendered) and only picks up sessionStorage after mount, in an effect --
+   reading it in the initial useState would make the client's first render
+   diverge from the server's, which is a hydration mismatch, not a shortcut. */
 export function ConsoleProvider({ children }: { children: ReactNode }) {
-  const [selected, setSelected] = useState<string[]>(() => loadPersisted()?.selected ?? []);
-  const [gen, setGen] = useState<GenerateResponse | null>(() => loadPersisted()?.gen ?? null);
-  const [det, setDet] = useState<DetectResponse | null>(() => loadPersisted()?.det ?? null);
-  const [selfPlay, setSelfPlay] = useState<SelfPlayRound[] | null>(() => loadPersisted()?.selfPlay ?? null);
-  const [zeroDay, setZeroDay] = useState<ZeroDayHypothesis[] | null>(() => loadPersisted()?.zeroDay ?? null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [gen, setGen] = useState<GenerateResponse | null>(null);
+  const [det, setDet] = useState<DetectResponse | null>(null);
+  const [selfPlay, setSelfPlay] = useState<SelfPlayRound[] | null>(null);
+  const [zeroDay, setZeroDay] = useState<ZeroDayHypothesis[] | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    // Deliberate one-time hydration from sessionStorage, not a derived-state
+    // smell -- must happen post-mount (see the comment above) so this is the
+    // sanctioned exception to "don't setState synchronously in an effect".
+    const persisted = loadPersisted();
+    if (persisted) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelected(persisted.selected);
+      setGen(persisted.gen);
+      setDet(persisted.det);
+      setSelfPlay(persisted.selfPlay);
+      setZeroDay(persisted.zeroDay);
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
     const persisted: Persisted = { selected, gen, det, selfPlay, zeroDay };
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
     } catch {
       // storage full or unavailable (private browsing) -- state still works in-memory
     }
-  }, [selected, gen, det, selfPlay, zeroDay]);
+  }, [hydrated, selected, gen, det, selfPlay, zeroDay]);
 
   const setResult = (g: GenerateResponse | null, d: DetectResponse | null) => {
     setGen(g);
