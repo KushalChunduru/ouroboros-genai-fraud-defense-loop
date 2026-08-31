@@ -83,7 +83,11 @@ export default function ZeroDayPanel({
           )}
           <div className="grid md:grid-cols-2 gap-3">
             {hyps.map((h) => (
-              <div key={h.cluster_id} className="card-2 card-hover p-4 text-sm" style={{ borderLeft: "2.5px solid var(--warn)" }}>
+              <div
+                key={h.cluster_id}
+                className="card card-hover p-4 text-sm"
+                style={{ border: "1.5px solid var(--border-strong)", borderLeft: "3px solid var(--warn)" }}
+              >
                 <div className="flex items-center justify-between mb-2">
                   <span className="data text-xs" style={{ color: "var(--muted)" }}>{h.cluster_id}</span>
                   <span className="pill" style={{ background: "color-mix(in srgb, var(--warn) 15%, white)", color: "var(--warn)", borderColor: "transparent" }}>
